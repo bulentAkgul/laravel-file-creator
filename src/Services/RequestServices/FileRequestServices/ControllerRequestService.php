@@ -33,6 +33,8 @@ class ControllerRequestService extends SrcRequestService
 
     private function setUseLines(): string
     {
+        if ($this->request['attr']['variation'] == 'invokable') return '';
+        
         $uses = [$this->setInertia()];
 
         foreach (['request', 'service'] as $type) {
