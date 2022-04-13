@@ -1,0 +1,23 @@
+<?php
+
+namespace {{ namespace }};
+
+use Illuminate\Contracts\Validation\ImplicitRule;
+
+class {{ class }} implements ImplicitRule
+{
+    public function __construct(): void
+    {
+        //
+    }
+
+    public function passes($attribute, mixed $value): bool
+    {
+        return true;
+    }
+
+    public function message(): string|array
+    {
+        return 'The validation error message.';
+    }
+}

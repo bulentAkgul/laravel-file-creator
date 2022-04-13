@@ -1,0 +1,45 @@
+<?php
+
+namespace {{ namespace }};
+
+use App\Http\Controllers\Controller;
+use {{ root_namespace }}\Models\{{ name }};
+use {{ root_namespace }}\Models\{{ parent }};
+{{ uses }}
+class {{ class }} extends Controller
+{
+    public function index({{ parent }} ${{ parent_var }}, Index{{ service }}Service $service)
+    {
+        return $service->handle(${{ parent_var }}, {{ name }}::class);
+    }
+
+    public function create({{ parent }} ${{ parent_var }}, Create{{ service }}Service $service)
+    {
+        return $service->handle(${{ parent_var }}, {{ name }}::class);
+    }
+
+    public function store(Store{{ request }}Request $request, {{ parent }} ${{ parent_var }}, Store{{ service }}Service $service)
+    {
+        return $service->handle($request, ${{ parent_var }}, {{ name }}::class);
+    }
+
+    public function show({{ parent }} ${{ parent_var }}, {{ name }} ${{ var }}, Show{{ service }}Service $service)
+    {
+        return $service->handle(${{ parent_var }}, ${{ var }});
+    }
+
+    public function edit({{ parent }} ${{ parent_var }}, {{ name }} ${{ var }}, Edit{{ service }}Service $service)
+    {
+        return $service->handle(${{ parent_var }}, ${{ var }});
+    }
+
+    public function update(Update{{ request }}Request $request, {{ parent }} ${{ parent_var }}, {{ name }} ${{ var }}, Update{{ service }}Service $service)
+    {
+        return $service->handle($request, ${{ parent_var }}, ${{ var }});
+    }
+
+    public function destroy({{ parent }} ${{ parent_var }}, {{ name }} ${{ var }}, Destroy{{ service }}Service $service)
+    {
+        return $service->handle(${{ parent_var }}, ${{ var }});
+    }
+}

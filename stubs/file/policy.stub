@@ -1,0 +1,47 @@
+<?php
+
+namespace {{ namespace }};
+
+use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Auth\Access\Response;
+use {{ root_namespace }}\Models\{{ name }};
+{{ user_model }}
+class {{ class }}
+{
+    use HandlesAuthorization;
+
+    public function viewAny(User $user): Response|bool
+    {
+        return false;
+    }
+
+    public function view(User $user, {{ name }} ${{ var }}): Response|bool
+    {
+        return false;
+    }
+
+    public function create(User $user): Response|bool
+    {
+        return false;
+    }
+
+    public function update(User $user, {{ name }} ${{ var }}): Response|bool
+    {
+        return false;
+    }
+
+    public function delete(User $user, {{ name }} ${{ var }}): Response|bool
+    {
+        return false;
+    }
+
+    public function restore(User $user, {{ name }} ${{ var }}): Response|bool
+    {
+        return false;
+    }
+
+    public function forceDelete(User $user, {{ name }} ${{ var }}): Response|bool
+    {
+        return false;
+    }
+}

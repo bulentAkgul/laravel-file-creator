@@ -1,0 +1,29 @@
+{
+  "name": "bakgul/laravel-file-creator",
+  "description": "Create Laravel files easily.",
+  "authors": [
+    {
+      "name": "Bulent Akgul",
+      "email": "bulent.akgul@me.com"
+    }
+  ],
+  "require": {},
+  "require-dev": {
+    "bakgul/kernel": "@dev",
+    "bakgul/command-evaluator": "@dev",
+    "bakgul/file-content": "@dev"
+  },
+  "autoload": {
+    "psr-4": {
+      "Bakgul\\FileCreator\\": "src/",
+      "Bakgul\\FileCreator\\Tests\\": "tests/"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Bakgul\\FileCreator\\FileCreatorServiceProvider"
+      ]
+    }
+  }
+}

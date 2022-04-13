@@ -1,0 +1,17 @@
+<?php
+
+namespace {{ namespace }};
+
+{{ user_model }}
+class {{ class }}
+{
+    public function __construct(): void
+    {
+        //
+    }
+
+    public function join(User $user): array|bool
+    {
+        return false;
+    }
+}

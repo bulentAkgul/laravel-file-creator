@@ -1,0 +1,44 @@
+<?php
+
+namespace {{ namespace }};
+
+use App\Http\Controllers\Controller;
+use {{ root_namespace }}\Models\{{ name }};
+{{ uses }}
+class {{ class }} extends Controller
+{
+    public function index(Index{{ service }}Service $service)
+    {
+        return $service->handle({{ name }}::class);
+    }
+
+    public function create(Create{{ service }}Service $service)
+    {
+        return $service->handle({{ name }}::class);
+    }
+
+    public function store(Store{{ request }}Request $request, Store{{ service }}Service $service)
+    {
+        return $service->handle($request, {{ name }}::class);
+    }
+
+    public function show({{ name }} ${{ var }}, Show{{ service }}Service $service)
+    {
+        return $service->handle(${{ var }});
+    }
+
+    public function edit({{ name }} ${{ var }}, Edit{{ service }}Service $service)
+    {
+        return $service->handle(${{ var }});
+    }
+
+    public function update(Update{{ request }}Request $request, {{ name }} ${{ var }}, Update{{ service }}Service $service)
+    {
+        return $service->handle($request, ${{ var }});
+    }
+
+    public function destroy({{ name }} ${{ var }}, Destroy{{ service }}Service $service)
+    {
+        return $service->handle(${{ var }});
+    }
+}

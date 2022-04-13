@@ -1,0 +1,33 @@
+<?php
+
+namespace {{ namespace }};
+
+use {{ root_namespace }}\Models\{{ name }};
+
+class {{ class }}
+{
+    public function created({{ name }} ${{ var }}): void
+    {
+        //
+    }
+
+    public function updated({{ name }} ${{ var }}): void
+    {
+        //
+    }
+
+    public function deleted({{ name }} ${{ var }}): void
+    {
+        //
+    }
+
+    public function restored({{ name }} ${{ var }}): void
+    {
+        //
+    }
+
+    public function forceDeleted({{ name }} ${{ var }}): void
+    {
+        //
+    }
+}
