@@ -1,7 +1,6 @@
 <?php
 
 return [
-    'abstract' => 'Abstracts',
     'api' => 'API',
     'channel' => 'Broadcasting',
     'enum' => 'Constants',
