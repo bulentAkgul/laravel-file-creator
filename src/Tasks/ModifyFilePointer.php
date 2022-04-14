@@ -2,33 +2,36 @@
 
 namespace Bakgul\FileCreator\Tasks;
 
-use Bakgul\Kernel\Helpers\Path;
 use Bakgul\Kernel\Helpers\Settings;
 
 class ModifyFilePointer
 {
     public static function path(array $request): string
     {
-        return self::isModifiable($request['attr']) ? str_replace(
-            Path::glue(['', 'app', $request['map']['container']]),
-            Path::glue(['', 'app', 'Http', $request['map']['container']]),
-            $request['attr']['path']
-        ) : $request['attr']['path'];
+        return self::isModifiable($request['attr'])
+            ? self::modify($request['attr']['path'], $request['map']['wrapper'])
+            : $request['attr']['path'];
     }
 
     public static function namespace(array $request)
     {
-        return self::isModifiable($request['attr']) ? str_replace(
-            "\\{$request['map']['container']}",
-            "\Http\\{$request['map']['container']}",
-            $request['map']['namespace']
-        ) : $request['map']['namespace'];
+        return self::isModifiable($request['attr'])
+            ? self::modify($request['map']['namespace'], $request['map']['wrapper'], '\\')
+            : $request['map']['namespace'];
+    }
+
+    private static function modify($pointer, $remove, $glue = DIRECTORY_SEPARATOR)
+    {
+        return str_replace("{$glue}{$remove}{$glue}", $glue, $pointer);
     }
 
     private static function isModifiable($attr)
     {
-        return (Settings::standalone('laravel')
-            || !Settings::standalone() && !$attr['package'])
-            && in_array($attr['type'], Settings::main('in_http'));
+        return match(true) {
+            !str_contains($attr['path_schema'], 'wrapper') => false,
+            Settings::standalone('laravel') => false,
+            Settings::standalone('package') => Settings::main('expand_http_in_packages'),
+            default => $attr['package'] && Settings::main('expand_http_in_packages')
+        };
     }
 }
