@@ -75,6 +75,15 @@ return [
         'variations' => [''],
         'pairs' => [],
     ],
+    'component' => [
+        'name_schema' => '{{ name }}',
+        'name_count' => 'X',
+        'family' => 'src',
+        'path_schema' => '{{ view }}{{ container }}{{ subs }}',
+        'tasks' => [''],
+        'variations' => [''],
+        'pairs' => [],
+    ],
     'controller' => [
         'name_schema' => '{{ name }}{{ suffix }}',
         'name_count' => 'S',
