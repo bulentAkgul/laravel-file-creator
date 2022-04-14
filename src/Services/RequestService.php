@@ -61,7 +61,7 @@ class RequestService extends FileCreator
 
     protected function setValue(string $value, string $case = 'pascal'): string
     {
-        return Arry::get(Path::make($value, case: $case), 0) ?? '';
+        return Arry::get(Path::make($value, $case), 0) ?? '';
     }
 
     protected function setNamespace(array $request): string
