@@ -10,6 +10,7 @@ use Bakgul\Kernel\Helpers\Text;
 use Bakgul\Kernel\Tasks\ConvertCase;
 use Bakgul\Kernel\Helpers\Convention;
 use Bakgul\FileCreator\Services\RequestService;
+use Bakgul\FileCreator\Tasks\ModifyFilePointer;
 
 class SrcRequestService extends RequestService
 {
@@ -38,6 +39,7 @@ class SrcRequestService extends RequestService
             'folder' => $this->setFolder($attr),
             'request' => $this->setMapName($attr, 'request'),
             'service' => $this->setMapName($attr, 'service'),
+            'view' => 'Views',
         ]);
     }
 
@@ -76,7 +78,7 @@ class SrcRequestService extends RequestService
         $request['attr']['path'] = $this->makeReplacements($request, 'path');
         $request['attr']['file'] = "{$request['map']['class']}.php";
 
-        return $request;
+        return $this->modifyPointers($request);
     }
 
     private function makeUserClass(array $request): string
@@ -88,6 +90,14 @@ class SrcRequestService extends RequestService
         return $request['map']['name'] != 'User' && $model
             ? "use {$model['class']};" . PHP_EOL
             : '';
+    }
+
+    private function modifyPointers(array $request)
+    {
+        $request['map']['namespace'] = ModifyFilePointer::namespace($request);
+        $request['attr']['path'] = ModifyFilePointer::path($request);
+
+        return $request;
     }
 
     private function setTask($request)

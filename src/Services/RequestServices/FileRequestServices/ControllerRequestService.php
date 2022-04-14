@@ -5,7 +5,6 @@ namespace Bakgul\FileCreator\Services\RequestServices\FileRequestServices;
 use Bakgul\Kernel\Helpers\Text;
 use Bakgul\Kernel\Helpers\Convention;
 use Bakgul\FileCreator\Services\RequestServices\SrcRequestService;
-use Bakgul\FileCreator\Tasks\AddInertia;
 use Bakgul\FileCreator\Tasks\ModifyFilePointer;
 
 class ControllerRequestService extends SrcRequestService
@@ -17,10 +16,8 @@ class ControllerRequestService extends SrcRequestService
         return [
             'attr' => array_merge($this->request['attr'], [
                 'stub' => $this->modifyStub(),
-                'path' => ModifyFilePointer::path($this->request)
             ]),
             'map' => array_merge($this->request['map'], [
-                'namespace' => ModifyFilePointer::namespace($this->request),
                 'uses' => $this->setUseLines('request'),
             ]),
         ];
@@ -69,6 +66,7 @@ class ControllerRequestService extends SrcRequestService
     {
         return ModifyFilePointer::namespace([
             'attr' => [
+                'type' => $type['type'],
                 'package' => $this->request['attr']['package']
             ],
             'map' => [
