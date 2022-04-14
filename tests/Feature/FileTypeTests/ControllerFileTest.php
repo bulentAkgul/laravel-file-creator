@@ -70,12 +70,17 @@ class ControllerFileTest extends FileTestService
 
     private function command(string $variation)
     {
-        return "create:file {$this->file} " . $this->type($variation) . " testing admin" . $this->parent($variation);
+        return "create:file {$this->file} " . $this->type($variation) . $this->app() . $this->parent($variation);
     }
 
     private function type($variation)
     {
         return $this->testType . Text::append($variation, ':');
+    }
+
+    private function app()
+    {
+        return Settings::standalone() ? " admin" : " testing admin";
     }
 
     private function parent($variation)
