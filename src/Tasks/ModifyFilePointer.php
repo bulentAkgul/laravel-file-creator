@@ -27,7 +27,8 @@ class ModifyFilePointer
 
     private static function isModifiable($attr)
     {
-        return Settings::standalone('laravel')
-            || !Settings::standalone() && !$attr['package'];
+        return (Settings::standalone('laravel')
+            || !Settings::standalone() && !$attr['package'])
+            && in_array($attr['type'], ['controller', 'request', 'resource', 'middleware']);
     }
 }
