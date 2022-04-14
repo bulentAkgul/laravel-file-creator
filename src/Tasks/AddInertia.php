@@ -14,6 +14,8 @@ class AddInertia
 
     public static function controller(array $request)
     {
+        if ($request['attr']['router'] != 'inertia') return;
+        
         $file = Path::glue([$request['attr']['path'], $request['attr']['file']]);
 
         $content = Content::read($file, purify: false);
