@@ -29,6 +29,6 @@ class ModifyFilePointer
     {
         return (Settings::standalone('laravel')
             || !Settings::standalone() && !$attr['package'])
-            && in_array($attr['type'], ['controller', 'request', 'resource', 'middleware']);
+            && in_array($attr['type'], Settings::main('in_http'));
     }
 }

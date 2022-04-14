@@ -12,4 +12,5 @@ return [
     ],
     'each_controller_has_route' => true,
     'non_class_types' => ['trait', 'interface', 'enum'],
+    'in_http' => ['controller', 'request', 'resource', 'middleware'],
 ];
