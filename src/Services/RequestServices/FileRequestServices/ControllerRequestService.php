@@ -6,6 +6,8 @@ use Bakgul\Kernel\Helpers\Text;
 use Bakgul\Kernel\Helpers\Convention;
 use Bakgul\FileCreator\Services\RequestServices\SrcRequestService;
 use Bakgul\FileCreator\Tasks\ModifyFilePointer;
+use Bakgul\Kernel\Helpers\Path;
+use Bakgul\Kernel\Helpers\Settings;
 
 class ControllerRequestService extends SrcRequestService
 {
@@ -35,6 +37,8 @@ class ControllerRequestService extends SrcRequestService
         $uses = [$this->setInertia()];
 
         foreach (['request', 'service'] as $type) {
+            if (!in_array($type, $this->request['attr']['pairs'])) continue;
+
             $uses[] = implode(PHP_EOL, array_map(
                 fn ($x) => $this->makeLine($x),
                 $this->getUseFiles($type)
@@ -67,30 +71,40 @@ class ControllerRequestService extends SrcRequestService
         return ModifyFilePointer::namespace([
             'attr' => [
                 'type' => $type['type'],
-                'package' => $this->request['attr']['package']
+                'package' => $this->request['attr']['package'],
+                'path_schema' => Settings::files("{$type['type']}.path_schema")
             ],
             'map' => [
-                'container' => Convention::namespace($type['type']),
                 'namespace' => $line,
+                'wrapper' => $this->request['map']['wrapper']
             ]
         ]);
     }
 
     private function generateNamespace($type)
     {
-        return str_replace([DIRECTORY_SEPARATOR, '\\\\'], '\\', Text::replaceByMap(
-            $this->modifyMap($type),
-            'use {{ root_namespace }}\{{ types }}\{{ pair_name }}{{ types }}\{{ subs }}\{{ task }}{{ pair_name }}{{ type }};'
-        ));
+        return 'use ' . str_replace('\\\\', '\\', Text::replaceByMap(
+            $this->modifyMap($type), $this->schema($type['type'])
+        )) . ';';
     }
 
     private function modifyMap(array $type): array
     {
         return array_merge($this->request['map'], [
-            'types' => Convention::namespace($type['type']),
-            'pair_name' => Convention::class($type['name']),
-            'task' => ucfirst($type['task']),
-            'type' => ucfirst($type['type']),
+            'container' => $c = Convention::namespace($type['type']),
+            'name' => $n = Convention::class($type['name']),
+            'folder' => $n . $c,
+            'task' => Convention::class($type['task']),
+            'suffix' => Convention::class($type['type']),
         ]);
+    }
+
+    private function schema(string $type)
+    {
+        return Path::glue([
+            '{{ root_namespace }}',
+            str_replace('}{', '}\{', Settings::files("{$type}.path_schema")),
+            Settings::files("{$type}.name_schema")
+        ], '\\');
     }
 }

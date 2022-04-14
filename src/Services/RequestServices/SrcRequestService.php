@@ -6,7 +6,6 @@ use Bakgul\Kernel\Helpers\Arry;
 use Bakgul\Kernel\Helpers\Settings;
 use Bakgul\Kernel\Helpers\Folder;
 use Bakgul\Kernel\Helpers\Pluralizer;
-use Bakgul\Kernel\Helpers\Text;
 use Bakgul\Kernel\Tasks\ConvertCase;
 use Bakgul\Kernel\Helpers\Convention;
 use Bakgul\FileCreator\Services\RequestService;
@@ -40,6 +39,7 @@ class SrcRequestService extends RequestService
             'request' => $this->setMapName($attr, 'request'),
             'service' => $this->setMapName($attr, 'service'),
             'view' => 'Views',
+            'wrapper' => 'Http',
         ]);
     }
 
