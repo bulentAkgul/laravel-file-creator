@@ -66,7 +66,6 @@ class GenerateNamespaceTest extends TestCase
                 foreach ($this->families() as $family) {
                     foreach ($this->tails($family) as $expect => $tails) {
                         foreach ($tails as $tail) {
-                            ray($this->expect($expect, $family, $isAlone, $isEmpty));
                             $this->assertEquals(
                                 $this->expect($expect, $family, $isAlone, $isEmpty),
                                 GenerateNamespace::_(
