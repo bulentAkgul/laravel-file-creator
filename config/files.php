@@ -148,6 +148,15 @@ return [
         'variations' => [''],
         'pairs' => [],
     ],
+    'livewire' => [
+        'name_schema' => '{{ name }}',
+        'name_count' => 'X',
+        'family' => 'src',
+        'path_schema' => '{{ wrapper }}{{ container }}{{ subs }}',
+        'tasks' => [''],
+        'variations' => ['', 'inline'],
+        'pairs' => [],
+    ],
     'mail' => [
         'name_schema' => '{{ name }}{{ suffix }}',
         'name_count' => 'S',
