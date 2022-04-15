@@ -9,6 +9,7 @@ use Bakgul\Kernel\Tasks\MakeFileList;
 use Bakgul\Evaluator\Concerns\ShouldBeEvaluated;
 use Bakgul\Evaluator\Services\FileCommandEvaluationService;
 use Bakgul\FileCreator\Services\FileService;
+use Bakgul\Kernel\Helpers\Settings;
 use Illuminate\Console\Command;
 
 class CreateFileCommand extends Command
@@ -38,7 +39,7 @@ class CreateFileCommand extends Command
     {
         $this->prepareRequest();
 
-        if (config('evaluator.evaluate_command')) {
+        if (Settings::evaluator('evaluate_commands')) {
             $this->evaluate();
 
             if ($this->stop()) return $this->terminate();
