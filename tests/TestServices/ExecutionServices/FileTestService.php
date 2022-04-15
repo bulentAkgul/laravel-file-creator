@@ -75,9 +75,9 @@ class FileTestService extends TestCase
 
     private function runCommand($command)
     {
-        if ($command['opt']['unknownPackage']) {
+        if ($command['opt']['unknownPackage'] && Settings::evaluator('evaluate_commands')) {
             return $this->artisan($command['str'])
-                ->expectsQuestion(str_replace(['{{ package }}', '{{ path }}'], ['x', 'app'], Settings::messages('package.unknown.file')), 'y');
+                ->expectsQuestion(str_replace('{{ package }}', 'x', Settings::messages('package.unknown.file')), 'y');
         }
 
         $this->artisan($command['str']);
