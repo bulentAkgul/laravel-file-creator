@@ -11,236 +11,146 @@ use Bakgul\Kernel\Tests\Tasks\SetupTest;
 class GenerateNamespaceTest extends TestCase
 {
     /** @test */
-    public function when_it_is_standalone_laravel_and_family_is_src_then_namespace_will_be_app()
+    public function when_it_is_standalone_laravel_then_the_namespace_will_be_family_regardless_of_the_package_specs()
     {
-        $this->testPackage = (new SetupTest)([false, true]);
+        $this->testPackage = (new SetupTest)([false, true], true);
 
-        $this->assertEquals('App', GenerateNamespace::_([
-            'root' => '',
-            'package' => '',
-            'family' => 'src'
-        ]));
+        foreach ([true, false] as $isEmpty) {
+            $this->assertEquals('App', GenerateNamespace::_($this->specs($isEmpty, 'src')));
+            $this->assertEquals('Tests', GenerateNamespace::_($this->specs($isEmpty, 'tests')));
+            $this->assertEquals('Database', GenerateNamespace::_($this->specs($isEmpty, 'database')));
+        }
     }
 
     /** @test */
-    public function when_it_is_standalone_laravel_and_family_is_database_then_namespace_will_be_database()
+    public function when_it_is_standalone_package_and_the_tail_is_empty_then_the_namespace_will_be_identity_namespace_regardless_of_the_family_and_package_specs()
     {
-        $this->testPackage = (new SetupTest)([false, true]);
+        $this->testPackage = (new SetupTest)([true, false], true);
 
-        $this->assertEquals('Database', GenerateNamespace::_([
-            'root' => '',
-            'package' => '',
-            'family' => 'database'
-        ]));
+        foreach ([true, false] as $isEmpty) {
+            foreach ($this->families() as $family) {
+                $this->assertEquals(Settings::identity('namespace'), GenerateNamespace::_($this->specs($isEmpty, $family)));
+            }
+        }
     }
 
     /** @test */
-    public function when_it_is_standalone_laravel_and_family_is_tests_then_namespace_will_be_tests()
+    public function when_it_is_not_standalone_and_the_package_specs_is_null_then_the_namespace_will_be_family()
     {
-        $this->testPackage = (new SetupTest)([false, true]);
+        $this->testPackage = (new SetupTest)([false, false], true);
 
-        $this->assertEquals('Tests', GenerateNamespace::_([
-            'root' => '',
-            'package' => '',
-            'family' => 'tests'
-        ]));
+        $this->assertEquals('App', GenerateNamespace::_($this->specs(true, 'src')));
+        $this->assertEquals('Tests', GenerateNamespace::_($this->specs(true, 'tests')));
+        $this->assertEquals('Database', GenerateNamespace::_($this->specs(true, 'database')));
     }
 
     /** @test */
-    public function when_it_is_standalone_laravel_package_and_root_make_no_change()
+    public function when_it_is_not_standalone_and_the_package_specs_is_provided_then_the_namespace_will_be_package_namespace_plus_family()
     {
-        $this->testPackage = (new SetupTest)([false, true]);
+        $this->testPackage = (new SetupTest)([false, false], true);
 
-        $this->assertEquals('App', GenerateNamespace::_([
-            'root' => 'core',
-            'package' => 'users',
-            'family' => 'src'
-        ]));
-
-        $this->assertEquals('Database', GenerateNamespace::_([
-            'root' => 'core',
-            'package' => 'users',
-            'family' => 'database'
-        ]));
-
-        $this->assertEquals('Tests', GenerateNamespace::_([
-            'root' => 'core',
-            'package' => 'users',
-            'family' => 'tests'
-        ]));
+        $this->assertEquals('Core\Users', GenerateNamespace::_($this->specs(false, 'src')));
+        $this->assertEquals('Core\Users\Tests', GenerateNamespace::_($this->specs(false, 'tests')));
+        $this->assertEquals('Core\Users\Database', GenerateNamespace::_($this->specs(false, 'database')));
     }
 
     /** @test */
-    public function when_it_is_standalone_package_and_family_is_src_then_namespace_will_be_standalone_namespace()
+    public function all_different_scenarios_will_be_tested()
     {
-        $this->testPackage = (new SetupTest)([true, false]);
+        $this->testPackage = (new SetupTest)([false, true], true);
 
-        $this->assertEquals(
-            Settings::identity('namespace'),
-            GenerateNamespace::_([
-                'root' => '',
-                'package' => '',
-                'family' => 'src'
-            ])
-        );
+        foreach ([[false, false], [false, true], [true, false]] as $isAlone) {
+            $this->testPackage = (new SetupTest)($isAlone, true);
+
+            foreach ([true, false] as $isEmpty) {
+                foreach ($this->families() as $family) {
+                    foreach ($this->tails($family) as $expect => $tails) {
+                        foreach ($tails as $tail) {
+                            ray($this->expect($expect, $family, $isAlone, $isEmpty));
+                            $this->assertEquals(
+                                $this->expect($expect, $family, $isAlone, $isEmpty),
+                                GenerateNamespace::_(
+                                    $this->specs($isEmpty, $family),
+                                    Path::glue($tail)
+                                )
+                            );
+                        }
+                    }
+                }
+            }
+        }
     }
 
-    /** @test */
-    public function when_it_is_standalone_package_and_family_is_database_then_namespace_will_be_standalone_namespace_plus_database()
+    private function specs($isEmpty, $family)
     {
-        $this->testPackage = (new SetupTest)([true, false]);
-
-        $this->assertEquals(
-            Settings::identity('namespace') . '\Database',
-            GenerateNamespace::_([
-                'root' => '',
-                'package' => '',
-                'family' => 'database'
-            ])
-        );
+        return [
+            'root' => $isEmpty ? '' : 'core',
+            'package' => $isEmpty ? '' : 'users',
+            'family' => $family
+        ];
     }
 
-    /** @test */
-    public function when_it_is_standalone_package_and_family_is_tests_then_namespace_will_be_standalone_namespace_plus_tests()
+    private function families()
     {
-        $this->testPackage = (new SetupTest)([true, false]);
-
-        $this->assertEquals(
-            Settings::identity('namespace') . '\Tests',
-            GenerateNamespace::_([
-                'root' => '',
-                'package' => '',
-                'family' => 'tests'
-            ])
-        );
+        return ['src', 'tests'];
     }
 
-    /** @test */
-    public function when_it_is_standalone_package_package_and_root_make_no_change()
+    private function tails($family)
     {
-        $this->testPackage = (new SetupTest)([true, false]);
-
-        $this->assertEquals(
-            Settings::identity('namespace'),
-            GenerateNamespace::_([
-                'root' => 'core',
-                'package' => 'users',
-                'family' => 'src'
-            ])
-        );
-
-        $this->assertEquals(
-            Settings::identity('namespace') . '\Database',
-            GenerateNamespace::_([
-                'root' => 'core',
-                'package' => 'users',
-                'family' => 'database'
-            ])
-        );
-
-        $this->assertEquals(
-            Settings::identity('namespace') . '\Tests',
-            GenerateNamespace::_([
-                'root' => 'core',
-                'package' => 'users',
-                'family' => 'tests'
-            ])
-        );
+        return [
+            'src' => [
+                'Services\UserServices' => [
+                    ['services', 'user-services'],
+                    ['Services', 'UserServices'],
+                ],
+                'Http\Resources\UserResources' => [
+                    ['http', 'resources', 'user-resources'],
+                    ['Http', 'resources', 'UserResources'],
+                ]
+            ],
+            'tests' => [
+                'Tests\Feature\MyFeatureTests\IsolationTests' => [
+                    ['feature', 'my-feature-tests', 'isolation-tests'],
+                    ['Feature', 'MyFeatureTests', 'IsolationTests'],
+                ]
+            ],
+            'database' => [
+                'Database\Factories' => [
+                    ['database', 'factories'],
+                ],
+                'Database\Seeders' => [
+                    ['Database', 'Seeders'],
+                ]
+            ]
+        ][$family];
     }
 
-    /** @test */
-    public function when_it_is_not_standalone_and_family_is_src_the_namespace_will_be_app_if_package_is_null()
+    private function expect($expect, $family, $isAlone, $isEmpty)
     {
-        $this->testPackage = (new SetupTest)([false, false]);
+        if ($isAlone[1]) {
+            return $this->glue([$this->family($family, true), $expect]);
+        }
 
-        $this->assertEquals('App', GenerateNamespace::_([
-            'root' => '',
-            'package' => '',
-            'family' => 'src'
-        ]));
+        if ($isAlone[0]) {
+            return $this->glue([
+                Settings::identity('namespace'),
+                $this->family($family, false),
+                $expect
+            ]);
+        }
+        
+        return $isEmpty
+            ? $this->glue([$this->family($family, true), $expect])
+            : $this->glue(['Core\Users', $this->family($family, false), $expect]);
     }
 
-    /** @test */
-    public function when_it_is_not_standalone_and_family_is_database_the_namespace_will_be_database_if_package_is_null()
+    private function family($family, $isApp)
     {
-        $this->testPackage = (new SetupTest)([false, false]);
-
-        $this->assertEquals('Database', GenerateNamespace::_([
-            'root' => '',
-            'package' => '',
-            'family' => 'database'
-        ]));
+        return $family == 'src' && $isApp ? 'App' : '';
     }
 
-    /** @test */
-    public function when_it_is_not_standalone_and_family_is_tests_the_namespace_will_be_tests_if_package_is_null()
+    private function glue($parts)
     {
-        $this->testPackage = (new SetupTest)([false, false]);
-
-        $this->assertEquals('Tests', GenerateNamespace::_([
-            'root' => '',
-            'package' => '',
-            'family' => 'tests'
-        ]));
-    }
-
-    /** @test */
-    public function when_it_is_not_standalone_and_package_name_is_provided_and_family_is_src_then_the_namespace_will_be_package_namespace()
-    {
-        $this->testPackage = (new SetupTest)([false, false]);
-
-        $this->assertEquals('Core\Users', GenerateNamespace::_([
-            'root' => 'core',
-            'package' => 'users',
-            'family' => 'src'
-        ]));
-    }
-
-    /** @test */
-    public function when_it_is_not_standalone_and_package_name_is_provided_and_family_is_database_then_the_namespace_will_be_package_namespace_plus_database()
-    {
-        $this->testPackage = (new SetupTest)([false, false]);
-
-        $this->assertEquals('Core\Users\Database', GenerateNamespace::_([
-            'root' => 'core',
-            'package' => 'users',
-            'family' => 'database'
-        ]));
-    }
-
-    /** @test */
-    public function when_it_is_not_standalone_and_package_name_is_provided_and_family_is_tests_then_the_namespace_will_be_package_namespace_plus_tests()
-    {
-        $this->testPackage = (new SetupTest)([false, false]);
-
-        $this->assertEquals('Core\Users\Tests', GenerateNamespace::_([
-            'root' => 'core',
-            'package' => 'users',
-            'family' => 'tests'
-        ]));
-    }
-
-    /** @test */
-    public function when_tail_path_is_provided_its_converted_version_will_be_appended_to_the_namespace()
-    {
-        $this->testPackage = (new SetupTest)([false, false]);
-
-        $this->assertEquals(
-            'Core\Users\Tests\Feature\MyFeatureTests\IsolationTests',
-            GenerateNamespace::_([
-                'root' => 'core',
-                'package' => 'users',
-                'family' => 'tests'
-            ], Path::glue(['Feature', 'MyFeatureTests', 'IsolationTests']))
-        );
-
-        $this->assertEquals(
-            'Core\Users\Tests\Feature\MyFeatureTests\IsolationTests',
-            GenerateNamespace::_([
-                'root' => 'core',
-                'package' => 'users',
-                'family' => 'tests'
-            ], Path::glue(['feature', 'my-feature-tests', 'isolation-tests']))
-        );
+        return Path::glue(array_filter($parts), '\\');
     }
 }
