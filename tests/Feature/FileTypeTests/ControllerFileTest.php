@@ -2,15 +2,7 @@
 
 namespace Bakgul\FileCreator\Tests\Feature\FileTypeTests;
 
-use Bakgul\Kernel\Helpers\Arry;
-use Bakgul\Kernel\Helpers\Path;
-use Bakgul\Kernel\Helpers\Settings;
-use Bakgul\Kernel\Helpers\Text;
-use Bakgul\Kernel\Tasks\CollectTypes;
-use Bakgul\Kernel\Tests\Tasks\SetupTest;
-use Bakgul\FileCreator\Tests\TestServices\AssertionServices\CommandsAssertionService;
 use Bakgul\FileCreator\Tests\TestServices\ExecutionServices\FileTestService;
-use Bakgul\FileCreator\Tests\TestServices\ExecutionServices\FilePathService;
 
 class ControllerFileTest extends FileTestService
 {
@@ -22,112 +14,45 @@ class ControllerFileTest extends FileTestService
     {
         parent::__construct();
     }
-    
+
     /** @test */
     public function controller_default()
     {
-        $this->do('');
+        $this->start('', $this->testType, $this->file, $this->extra(false, false), 'admin');
     }
 
     /** @test */
     public function controller_api()
     {
-        $this->do('api');
+        $this->start('api', $this->testType, $this->file, $this->extra(true, false), 'admin');
     }
 
     /** @test */
     public function controller_invokable()
     {
-        $this->do('invokable');
+        $this->start('invokable', $this->testType, $this->file, $this->extra(false, false), 'admin');
     }
 
     /** @test */
     public function controller_nested_api()
     {
-        $this->do('nested-api');
+        $this->start('nested-api', $this->testType, $this->file, $this->extra(true, true), "admin -p={$this->parent}");
     }
 
     /** @test */
     public function controller_nested_default()
     {
-        $this->do('nested');
+        $this->start('nested', $this->testType, $this->file, $this->extra(false, true), "admin -p={$this->parent}");
     }
 
     /** @test */
     public function controller_plain()
     {
-        $this->do('plain');
+        $this->start('plain', $this->testType, $this->file, $this->extra(false, false), 'admin');
     }
 
-    private function do($variation)
+    private function extra(bool $api, bool $parent): array
     {
-        $this->testPackage = (new SetupTest)();
-        
-        $this->artisan($this->command($variation));
-
-        $this->executeTest($variation);
-    }
-
-    private function command(string $variation)
-    {
-        return "create:file {$this->file} " . $this->type($variation) . $this->app() . $this->parent($variation);
-    }
-
-    private function type($variation)
-    {
-        return $this->testType . Text::append($variation, ':');
-    }
-
-    private function app()
-    {
-        return Settings::standalone() ? " admin" : " testing admin";
-    }
-
-    private function parent($variation)
-    {
-        return str_contains($variation, 'nested') ? " --parent='{$this->parent}'" : ''; 
-    }
-
-    private function executeTest(string $variation)
-    {
-        $api = str_contains($variation, 'api');
-
-        $asserter = new CommandsAssertionService;
-
-        foreach ($this->setPaths($api, $variation) as $path) {
-            $fullPath = Path::glue([$this->testPackage['path'], $path]);
-
-            $this->assertFileExists($fullPath);
-
-            $this->assertTrue(...$asserter->handle(
-                $fullPath,
-                $this->setType($this->testType, $variation, $path, $this->parent),
-                $this->parent
-            ));
-        }
-
-        foreach ($api ? FilePathService::service($this->file, 'not') : [] as $path) {
-            $this->assertFileDoesNotExist(Path::glue([$this->testPackage['path'], $path]));
-        }
-    }
-
-    private function setPaths(bool $api, string $variation): array
-    {
-        return FilePathService::compose($this->types($variation), $this->file, $this->extra($api, $variation));
-    }
-
-    private function types($variation)
-    {
-        $parent = Arry::has($variation, Settings::main('need_parent')) ? $this->parent : '';
-
-        return CollectTypes::_([[
-            'type' => 'controller',
-            'variation' => $variation
-        ]], parent: $parent);
-    }
-
-    private function extra(bool $api, string $variation): array
-    {
-        return  ['api' => $api, 'parent' => Arry::has($variation, Settings::main('need_parent'))];
+        return  ['api' => $api, 'parent' => $parent];
     }
 }
