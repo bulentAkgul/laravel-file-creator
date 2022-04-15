@@ -91,7 +91,7 @@ return [
         'path_schema' => '{{ wrapper }}{{ container }}{{ app }}{{ api }}{{ subs }}',
         'tasks' => [''],
         'variations' => ['', 'api', 'invokable', 'model-api', 'model', 'nested-api', 'nested', 'plain'],
-        'pairs' => ['model', 'request', 'service'],
+        'pairs' => ['model', 'request', 'resource', 'service'],
     ],
     'enum' => [
         'name_schema' => '{{ name }}',
