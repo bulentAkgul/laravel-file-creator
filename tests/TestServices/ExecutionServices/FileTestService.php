@@ -10,7 +10,9 @@ use Bakgul\Kernel\Tests\Tasks\SetupTest;
 use Bakgul\FileCreator\Tests\TestServices\AssertionServices\CommandsAssertionService;
 use Bakgul\Kernel\Helpers\Arry;
 use Bakgul\Kernel\Helpers\Convention;
+use Bakgul\Kernel\Helpers\Folder;
 use Bakgul\Kernel\Tasks\ConvertCase;
+use Bakgul\Kernel\Tests\Services\TestDataService;
 use Bakgul\Kernel\Tests\TestCase;
 use Illuminate\Support\Str;
 
@@ -25,26 +27,37 @@ class FileTestService extends TestCase
 
     public function start($variation, $testType, $name = '', $extra = false, $append = '')
     {
-        $this->testPackage = (new SetupTest)();
+        foreach (TestDataService::standalone() as $isAlone) {
+            foreach ($isAlone['root'] as $hasRoot) {
+                $this->testPackage = (new SetupTest)($isAlone);
 
-        $this->artisan($this->command($testType, $variation, $name, $extra, $append));
+                $command = $this->command($hasRoot, $isAlone, $testType, $variation, $name, $extra, $append);
 
-        $this->execute($variation, $testType, $name, $extra);
+                $this->runCommand($command);
+
+                // $this->execute($command['opt'], $variation, $testType, $name, $extra);
+            }
+        }
     }
 
-    private function command(string $type, string $variation, string $name, $task, $append)
+    private function command(bool $hasRoot, array $isAlone, string $type, string $variation, string $name, $task, $append)
     {
-        $task = $task == 'taskless' ? $task : (
-            in_array($task, Settings::files("{$type}.tasks")) ? $task : ''
-        );
+        $isAlone = array_reduce([$isAlone['sl'], $isAlone['sp']], fn ($p, $c) => $p || $c, false);
 
-        return "create:file "
-            . $this->name($name, $task)
-            . " {$type}"
-            . Text::append($variation, ':')
-            . " {$this->testPackage['name']}"
-            . Text::append($append, ' ')
-            . Text::append($task == 'taskless' ? '-t' : '', ' ');
+        $task = $task == 'taskless' ? $task : (in_array($task, Settings::files("{$type}.tasks")) ? $task : '');
+
+        return [
+            'opt' => [
+                'unknownPackage' => !$isAlone && !$hasRoot,
+            ],
+            'str' => "create:file "
+                . $this->name($name, $task)
+                . " {$type}"
+                . Text::append($variation, ':')
+                . Text::append($this->package($hasRoot, $isAlone), ' ')
+                . Text::append($append, ' ')
+                . Text::append($task == 'taskless' ? '-t' : '', ' ')
+        ];
     }
 
     private function name(string $name = '', array|bool|string $task = '')
@@ -53,25 +66,64 @@ class FileTestService extends TestCase
             . Text::append(is_string($task) && $task != 'taskless' ? $task : '', ':');
     }
 
-    private function execute($variation, $testType, $name, $extra)
+    private function package($hasRoot, $isAlone)
+    {
+        return !$isAlone
+            ? ($hasRoot ? $this->testPackage['name'] : 'x')
+            : '';
+    }
+
+    private function runCommand($command)
+    {
+        if ($command['opt']['unknownPackage']) {
+            return $this->artisan($command['str'])
+                ->expectsQuestion(str_replace(['{{ package }}', '{{ path }}'], ['x', 'app'], Settings::messages('package.unknown.file')), 'y');
+        }
+
+        $this->artisan($command['str']);
+    }
+
+    private function execute($options, $variation, $testType, $name, $extra)
     {
         $asserter = new CommandsAssertionService;
 
-        foreach ($this->setPaths($testType, $name, $extra) as $path) {
-            $fullPath = Path::glue([$this->testPackage['path'], $path]);
+        foreach ($this->setPaths($testType, $name, $options, $extra) as $path) {
+            $fullPath = Path::glue([$this->basePath($options), $path], DIRECTORY_SEPARATOR);
 
             $this->assertFileExists($fullPath);
 
-            $this->assertTrue(...$asserter->handle(
-                $fullPath,
-                $this->setType($testType, $variation, $path)
-            ));
+            // $this->assertTrue(...$asserter->handle(
+            //     $fullPath,
+            //     $this->setType($testType, $variation, $path)
+            // ));
         }
     }
 
-    private function setPaths(string $type, string $name, mixed $extra = false): array
+    private function setPaths(string $type, string $name, array $options, mixed $extra = false): array
     {
-        return FilePathService::compose(CollectTypes::_($type), $name ?: $this->file, $extra);
+        return FilePathService::compose($options, CollectTypes::_($type), $name ?: $this->file, $extra);
+    }
+
+    private function basePath($options)
+    {
+        if (!$options['missingPackage']) return $this->testPackage['path'];
+
+        return implode(
+            DIRECTORY_SEPARATOR,
+            array_filter(
+                explode(DIRECTORY_SEPARATOR, $this->testPackage['path']),
+                fn ($x) => $this->isRequiredPathPart($x)
+            )
+        );
+    }
+
+    private function isRequiredPathPart(string $part): bool
+    {
+        return !in_array($part, [
+            Settings::main('packages_root') ?? 'packages',
+            $this->testPackage['folder'],
+            $this->testPackage['name']
+        ]);
     }
 
     protected function setType(string $testType, string $variation, string $path, string $file = ''): array
