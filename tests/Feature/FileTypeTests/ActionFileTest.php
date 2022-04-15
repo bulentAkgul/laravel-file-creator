@@ -11,7 +11,7 @@ class ActionFileTest extends FileTestService
 
     public function __construct()
     {
-        parent::__construct('sl', true);
+        parent::__construct();
     }
 
     /** @test */
