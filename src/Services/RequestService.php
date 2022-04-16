@@ -11,7 +11,7 @@ use Bakgul\FileCreator\FileCreator;
 use Bakgul\Kernel\Helpers\Convention;
 use Bakgul\Kernel\Helpers\Folder;
 use Bakgul\Kernel\Tasks\GenerateNamespace;
-use Bakgul\Kernel\Tasks\SetRequestAttr;
+use Bakgul\Kernel\Tasks\RequestTasks\GenerateAttr;
 
 class RequestService extends FileCreator
 {
@@ -25,7 +25,7 @@ class RequestService extends FileCreator
 
     private function generateAttr(array $request)
     {
-        return [...SetRequestAttr::_($request), 'job' => 'file'];
+        return [...GenerateAttr::_($request), 'job' => 'file'];
     }
 
     private function generateMap(array $attr): array
