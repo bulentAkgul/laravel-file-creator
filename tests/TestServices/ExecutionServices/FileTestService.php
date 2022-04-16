@@ -36,7 +36,7 @@ class FileTestService extends TestCase
                 $this->testPackage = (new SetupTest)($scenario);
 
                 $command = $this->command($hasRoot, $scenario, $testType, $variation, $name, $extra, $append);
-                ray($command);
+
                 $this->runCommand($command);
 
                 // $this->execute($command['opt'], $variation, $testType, $name, $extra);
