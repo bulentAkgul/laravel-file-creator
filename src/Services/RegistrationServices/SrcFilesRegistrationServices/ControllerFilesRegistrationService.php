@@ -4,6 +4,7 @@ namespace Bakgul\FileCreator\Services\RegistrationServices\SrcFilesRegistrationS
 
 use Bakgul\FileCreator\Services\RegistrationServices\SrcFilesRegistrationService;
 use Bakgul\FileCreator\Services\RequestServices\RegistrationRequestServices\ControllerRegistrationRequestService;
+use Bakgul\FileCreator\Tasks\AddInertia;
 
 class ControllerFilesRegistrationService extends SrcFilesRegistrationService
 {
