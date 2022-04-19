@@ -46,7 +46,7 @@ class PurifyController
             fn ($x) => Pluralizer::make(Isolation::name($x), $attr['name_count']) == $attr['name']
         ))[0]);
 
-        return  in_array('all', $tasks) || empty(array_filter($tasks))
+        return  !array_filter($tasks)
             ? Settings::main('tasks.' . (str_contains($attr['variation'], 'api') ? 'api' : 'all'))
             : $tasks;
     }
