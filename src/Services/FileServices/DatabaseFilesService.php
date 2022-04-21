@@ -4,6 +4,8 @@ namespace Bakgul\FileCreator\Services\FileServices;
 
 use Bakgul\FileCreator\Services\FileService;
 use Bakgul\FileCreator\Services\RequestServices\DatabaseRequestService;
+use Bakgul\Kernel\Functions\CallClass;
+use Bakgul\Kernel\Functions\CreateFile;
 
 class DatabaseFilesService extends FileService
 {
@@ -11,8 +13,6 @@ class DatabaseFilesService extends FileService
     {
         $request = (new DatabaseRequestService)->handle($request);
 
-        $this->isClassExist($request['attr']['type'], 'Database')
-            ? $this->callClass($request, 'Database')
-            : $this->createFile($request);
+        CallClass::_($request, 'database', __NAMESPACE__) ?: CreateFile::_($request);
     }
 }

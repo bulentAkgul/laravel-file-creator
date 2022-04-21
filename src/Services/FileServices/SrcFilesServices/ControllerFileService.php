@@ -3,10 +3,11 @@
 namespace Bakgul\FileCreator\Services\FileServices\SrcFilesServices;
 
 use Bakgul\FileCreator\Services\FileServices\SrcFilesService;
-use Bakgul\FileCreator\Services\RegistrationServices\SrcFilesRegistrationServices\ControllerFilesRegistrationService;
+use Bakgul\FileCreator\Services\RegistrationServices\ControllerFilesRegistrationService;
 use Bakgul\FileCreator\Services\RequestServices\FileRequestServices\ControllerRequestService;
 use Bakgul\FileCreator\Tasks\AddInertia;
 use Bakgul\FileCreator\Tasks\PurifyController;
+use Bakgul\Kernel\Functions\CreateFile;
 
 class ControllerFileService extends SrcFilesService
 {
@@ -16,7 +17,7 @@ class ControllerFileService extends SrcFilesService
     {
         $this->request = (new ControllerRequestService($request))();
 
-        $this->createFile($this->request);
+        CreateFile::_($this->request);
 
         PurifyController::_($this->request);
 

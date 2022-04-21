@@ -4,6 +4,8 @@ namespace Bakgul\FileCreator\Services\FileServices;
 
 use Bakgul\FileCreator\Services\FileService;
 use Bakgul\FileCreator\Services\RequestServices\SrcRequestService;
+use Bakgul\Kernel\Functions\CallClass;
+use Bakgul\Kernel\Functions\CreateFile;
 
 class SrcFilesService extends FileService
 {
@@ -11,8 +13,6 @@ class SrcFilesService extends FileService
     {
         $request = (new SrcRequestService)->handle($request);
 
-        $this->isClassExist($request['attr']['type'], 'Src')
-            ? $this->callClass($request, 'Src')
-            : $this->createFile($request);
+        CallClass::_($request, 'src', __NAMESPACE__) ?: CreateFile::_($request);
     }
 }
