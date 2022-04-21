@@ -6,6 +6,6 @@ class {{ class }}
 {
     public function handle({{ args }})
     {
-      //
+        //
     }
 }

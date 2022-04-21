@@ -16,7 +16,7 @@ class EventListenerRegistrationRequestService extends SrcRegistrationRequestServ
             ]),
             'map' => array_merge($request['map'], [
                 'imports' => $this->setCodeLine($request['map']),
-                'block' => $this->setCodeBlock($request['map'], true),
+                'block' => $this->setCodeBlock($request['map'], $request['attr']['type'] == 'event'),
             ]),
         ];
     }
