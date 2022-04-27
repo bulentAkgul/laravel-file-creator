@@ -8,7 +8,7 @@ use Bakgul\Kernel\Functions\CreateFile;
 
 class ActionFileService extends SrcFilesService
 {
-    public function __invoke(array $request): void
+    public function create(array $request): void
     {
         CreateFile::_((new ActionRequestService)($request));
     }

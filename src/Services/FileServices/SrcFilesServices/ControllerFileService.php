@@ -13,7 +13,7 @@ class ControllerFileService extends SrcFilesService
 {
     private $request;
 
-    public function __invoke(array $request): void
+    public function create(array $request): void
     {
         $this->request = (new ControllerRequestService($request))();
 
