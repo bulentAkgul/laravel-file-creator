@@ -4,6 +4,7 @@ namespace Bakgul\FileCreator\Services\RequestServices;
 
 use Bakgul\Kernel\Helpers\Convention;
 use Bakgul\FileCreator\Services\RequestService;
+use Bakgul\Kernel\Helpers\Pluralizer;
 use Carbon\Carbon;
 
 class DatabaseRequestService extends RequestService
@@ -19,9 +20,8 @@ class DatabaseRequestService extends RequestService
     private function extendMap(array $map, array $attr): array
     {
         return array_merge($map, [
-            'table' => Convention::table($attr['name']),
+            'table' => Convention::table($attr['name'], Pluralizer::set($attr['name_count'])),
             'date' => Carbon::today()->format('Y_m_d'),
-            'pivot_columns' => ""
         ]);
     }
 
