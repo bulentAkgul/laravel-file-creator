@@ -3,7 +3,7 @@
 namespace Bakgul\FileCreator\Services;
 
 use Bakgul\FileCreator\FileCreator;
-use Bakgul\ResourceCreator\Tasks\Register;
+use Bakgul\FileContent\Tasks\Register;
 
 class RegistrationService extends FileCreator
 {
