@@ -12,7 +12,7 @@ class ListenerFilesRegistrationService extends RegistrationService
     {
         $this->setRequest((new EventListenerRegistrationRequestService)($request));
 
-        $this->register($this->lineSpecs(),$this->blockSpecs($this->setParent($request)));
+        $this->register($this->lineSpecs(), $this->blockSpecs($this->setParent($request)));
     }
 
     private function setParent(array $request): string
