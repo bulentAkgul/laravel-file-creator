@@ -2,7 +2,6 @@
 
 namespace Bakgul\FileCreator;
 
-use Bakgul\Kernel\Functions\CallCommand;
 use Bakgul\Kernel\Helpers\Settings;
 use Bakgul\Kernel\Helpers\Path;
 use Bakgul\FileContent\Helpers\Content;
@@ -22,10 +21,5 @@ class FileCreator
     public function stringifyPath(array $path, bool $isFull = false): string
     {
         return Path::stringify($path, $isFull);
-    }
-
-    public function artisan(array|string $commands): void
-    {
-        CallCommand::_($commands);
     }
 }
