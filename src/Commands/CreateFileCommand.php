@@ -39,9 +39,10 @@ class CreateFileCommand extends Command
     {
         $this->prepareRequest();
 
-        $this->evaluate();
-
-        if ($this->stop()) return $this->terminate();
+        if (Settings::evaluator('evaluate_commands')) {
+            $this->evaluate();
+            if ($this->stop()) return $this->terminate();
+        }
 
         $this->createFiles(MakeFileList::_($this->request));
     }
