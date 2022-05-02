@@ -4,6 +4,7 @@ namespace Bakgul\FileCreator\Tests\Feature\TaskTests;
 
 use Bakgul\Kernel\Helpers\Path;
 use Bakgul\Kernel\Helpers\Settings;
+use Bakgul\Kernel\Helpers\Text;
 use Bakgul\Kernel\Tests\TestCase;
 use Bakgul\Kernel\Tasks\GenerateNamespace;
 use Bakgul\Kernel\Tests\Services\TestDataService;
@@ -30,7 +31,10 @@ class GenerateNamespaceTest extends TestCase
 
         foreach ([true, false] as $isEmpty) {
             foreach ($this->families() as $family) {
-                $this->assertEquals(Settings::identity('namespace'), GenerateNamespace::_($this->specs($isEmpty, $family)));
+                $this->assertEquals(
+                    Settings::identity('namespace') . Text::append($family == 'src' ? '' : ucfirst($family), '\\'),
+                    GenerateNamespace::_($this->specs($isEmpty, $family))
+                );
             }
         }
     }
@@ -58,15 +62,15 @@ class GenerateNamespaceTest extends TestCase
     /** @test */
     public function all_different_scenarios_will_be_tested()
     {
-        foreach ([[false, false], [false, true], [true, false]] as $isAlone) {
-            $this->testPackage = (new SetupTest)($isAlone, true);
+        foreach (['sl', 'sp', 'pl'] as $scenario) {
+            $this->testPackage = (new SetupTest)(TestDataService::standalone($scenario), true);
 
             foreach ([true, false] as $isEmpty) {
                 foreach ($this->families() as $family) {
                     foreach ($this->tails($family) as $expect => $tails) {
                         foreach ($tails as $tail) {
                             $this->assertEquals(
-                                $this->expect($expect, $family, $isAlone, $isEmpty),
+                                $this->expect($expect, $family, $scenario, $isEmpty),
                                 GenerateNamespace::_(
                                     $this->specs($isEmpty, $family),
                                     Path::glue($tail)
@@ -123,20 +127,20 @@ class GenerateNamespaceTest extends TestCase
         ][$family];
     }
 
-    private function expect($expect, $family, $isAlone, $isEmpty)
+    private function expect($expect, $family, $scenario, $isEmpty)
     {
-        if ($isAlone[1]) {
+        if ($scenario == 'sl') {
             return $this->glue([$this->family($family, true), $expect]);
         }
 
-        if ($isAlone[0]) {
+        if ($scenario == 'sp') {
             return $this->glue([
                 Settings::identity('namespace'),
                 $this->family($family, false),
                 $expect
             ]);
         }
-        
+
         return $isEmpty
             ? $this->glue([$this->family($family, true), $expect])
             : $this->glue(['Core\Users', $this->family($family, false), $expect]);
