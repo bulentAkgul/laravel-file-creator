@@ -5,6 +5,7 @@ namespace Bakgul\FileCreator\Tests\Feature\TaskTests;
 use Bakgul\Kernel\Helpers\Path;
 use Bakgul\Kernel\Helpers\Settings;
 use Bakgul\Kernel\Helpers\Text;
+use Bakgul\Kernel\Tasks\CompleteFolders;
 use Bakgul\Kernel\Tests\TestCase;
 use Bakgul\Kernel\Tasks\GenerateNamespace;
 use Bakgul\Kernel\Tests\Services\TestDataService;
@@ -15,7 +16,7 @@ class GenerateNamespaceTest extends TestCase
     /** @test */
     public function when_it_is_standalone_laravel_then_the_namespace_will_be_family_regardless_of_the_package_specs()
     {
-        $this->testPackage = (new SetupTest)(TestDataService::standalone('sl'), true);
+        $this->prepare('sl');
 
         foreach ([true, false] as $isEmpty) {
             $this->assertEquals('App', GenerateNamespace::_($this->specs($isEmpty, 'src')));
@@ -27,7 +28,7 @@ class GenerateNamespaceTest extends TestCase
     /** @test */
     public function when_it_is_standalone_package_and_the_tail_is_empty_then_the_namespace_will_be_identity_namespace_regardless_of_the_family_and_package_specs()
     {
-        $this->testPackage = (new SetupTest)(TestDataService::standalone('sp'), true);
+        $this->prepare('sp');
 
         foreach ([true, false] as $isEmpty) {
             foreach ($this->families() as $family) {
@@ -42,7 +43,7 @@ class GenerateNamespaceTest extends TestCase
     /** @test */
     public function when_it_is_not_standalone_and_the_package_specs_is_null_then_the_namespace_will_be_family()
     {
-        $this->testPackage = (new SetupTest)(TestDataService::standalone('pl'), true);
+        $this->prepare('pl');
 
         $this->assertEquals('App', GenerateNamespace::_($this->specs(true, 'src')));
         $this->assertEquals('Tests', GenerateNamespace::_($this->specs(true, 'tests')));
@@ -52,7 +53,7 @@ class GenerateNamespaceTest extends TestCase
     /** @test */
     public function when_it_is_not_standalone_and_the_package_specs_is_provided_then_the_namespace_will_be_package_namespace_plus_family()
     {
-        $this->testPackage = (new SetupTest)(TestDataService::standalone('pl'), true);
+        $this->prepare('pl');
 
         $this->assertEquals('Core\Users', GenerateNamespace::_($this->specs(false, 'src')));
         $this->assertEquals('Core\Users\Tests', GenerateNamespace::_($this->specs(false, 'tests')));
@@ -63,7 +64,7 @@ class GenerateNamespaceTest extends TestCase
     public function all_different_scenarios_will_be_tested()
     {
         foreach (['sl', 'sp', 'pl'] as $scenario) {
-            $this->testPackage = (new SetupTest)(TestDataService::standalone($scenario), true);
+            $this->prepare($scenario);
 
             foreach ([true, false] as $isEmpty) {
                 foreach ($this->families() as $family) {
@@ -81,6 +82,13 @@ class GenerateNamespaceTest extends TestCase
                 }
             }
         }
+    }
+    
+    private function prepare($scenario)
+    {
+        $this->testPackage = (new SetupTest)(TestDataService::standalone($scenario), true);
+
+        CompleteFolders::_(Path::glue([base_path(), 'packages', 'core', 'users']), false);
     }
 
     private function specs($isEmpty, $family)

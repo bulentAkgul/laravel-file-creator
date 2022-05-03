@@ -6,11 +6,11 @@ use Bakgul\FileCreator\Tests\TestServices\AssertionServices\CommandsAssertionSer
 
 class ObserverAssertionService extends CommandsAssertionService
 {
-    public function default(string $path): array
+    public function default(string $path, string $rootNamespace): array
     {
         return $this->assert(
             [
-                2 => 'namespace CurrentTest\Testing\Observers;',
+                2 => $this->setNamespace($rootNamespace, 'src', 'Observers'),
                 6 => 'class {{ name }}Observer',
                 18 => 'public function deleted({{ name }} ${{ var }}): void',
                 28 => 'public function forceDeleted({{ name }} ${{ var }}): void',

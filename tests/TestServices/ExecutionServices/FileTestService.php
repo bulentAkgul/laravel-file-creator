@@ -18,56 +18,47 @@ use Illuminate\Support\Str;
 class FileTestService extends TestCase
 {
     private $file = 'post';
-    private $scenarios;
+    private $fakePackage = 'x';
+    private $scenario;
+    private $package;
 
-    public function __construct(?string $scenario = null, private $hasRoot = null)
+    public function __construct(?string $scenario = null, ?bool $hasRoot = null)
     {
-        $this->scenarios = $scenario ? [$scenario] : TestDataService::scenarios();
+        $this->scenario = TestDataService::standalone(
+            $scenario ?: Arry::random(['sl', 'sp', 'pl'])[0],
+            $hasRoot ?? Arry::random([true, false])[0]
+        );
 
         parent::__construct();
     }
 
     public function start($variation, $testType, $name = '', $extra = false, $append = '')
     {
-        foreach ($this->scenarios as $scenario) {
-            $scenario = $this->setScenario($scenario);
+        $this->testPackage = (new SetupTest)($this->scenario);
 
-            foreach ($scenario['root'] as $hasRoot) {
-                $this->testPackage = (new SetupTest)($scenario);
+        $command = $this->command($testType, $variation, $name, $extra, $append);
 
-                $command = $this->command($hasRoot, $scenario, $testType, $variation, $name, $extra, $append);
+        $this->runCommand($command);
 
-                $this->runCommand($command);
-
-                // $this->execute($command['opt'], $variation, $testType, $name, $extra);
-            }
-        }
+        $this->execute($variation, $testType, $name, $extra);
     }
 
-    private function setScenario($scenario)
+    private function command(string $type, string $variation, string $name, $task, $append)
     {
-        return TestDataService::standalone($scenario, $this->hasRoot);
-    }
+        $isAlone = array_reduce([$this->scenario['sl'], $this->scenario['sp']], fn ($p, $c) => $p || $c, false);
 
-    private function command(bool $hasRoot, array $scenario, string $type, string $variation, string $name, $task, $append)
-    {
-        $isAlone = array_reduce([$scenario['sl'], $scenario['sp']], fn ($p, $c) => $p || $c, false);
+        $this->package($isAlone);
 
         $task = $task == 'taskless' ? $task : (in_array($task, Settings::files("{$type}.tasks")) ? $task : '');
 
-        return [
-            'opt' => [
-                'unknownPackage' => !$isAlone && !$hasRoot,
-            ],
-            'str' => implode(' ', array_filter([
-                "create:file",
-                $this->name($name, $task),
-                $type . Text::append($variation, ':'),
-                $this->package($hasRoot, $isAlone),
-                $append,
-                $task == 'taskless' ? '-t' : '',
-            ]))
-        ];
+        return implode(' ', array_filter([
+            "create:file",
+            $this->name($name, $task),
+            $type . Text::append($variation, ':'),
+            $this->package,
+            $append,
+            $task == 'taskless' ? '-t' : '',
+        ]));
     }
 
     private function name(string $name = '', array|bool|string $task = '')
@@ -76,47 +67,48 @@ class FileTestService extends TestCase
             . Text::append(is_string($task) && $task != 'taskless' ? $task : '', ':');
     }
 
-    private function package(bool $hasRoot, bool $isAlone): string
+    private function package(bool $isAlone): void
     {
-        return !$isAlone
-            ? ($hasRoot ? $this->testPackage['name'] : 'x')
+        $this->package = !$isAlone
+            ? ($this->scenario['root'] ? $this->testPackage['name'] : $this->fakePackage)
             : '';
     }
 
     private function runCommand($command)
     {
-        if ($command['opt']['unknownPackage'] && Settings::evaluator('evaluate_commands')) {
-            return $this->artisan($command['str'])
-                ->expectsQuestion(str_replace('{{ package }}', 'x', Settings::messages('package.unknown.file')), 'y');
+        if ($this->package == $this->fakePackage && Settings::evaluator('evaluate_commands')) {
+            return $this->artisan($command)
+                ->expectsQuestion(str_replace('{{ package }}', $this->fakePackage, Settings::messages('package.unknown.file')), 'y');
         }
 
-        $this->artisan($command['str']);
+        $this->artisan($command);
     }
 
-    private function execute($options, $variation, $testType, $name, $extra)
+    private function execute($variation, $testType, $name, $extra)
     {
         $asserter = new CommandsAssertionService;
 
-        foreach ($this->setPaths($testType, $name, $options, $extra) as $path) {
-            $fullPath = Path::glue([$this->basePath($options), $path], DIRECTORY_SEPARATOR);
+        foreach ($this->setPaths($testType, $name, $variation, $extra) as $path) {
+            $fullPath = Path::glue([$this->basePath(), $path]);
 
             $this->assertFileExists($fullPath);
-
-            // $this->assertTrue(...$asserter->handle(
-            //     $fullPath,
-            //     $this->setType($testType, $variation, $path)
-            // ));
+            
+            $this->assertTrue(...$asserter->handle(
+                $fullPath,
+                $this->setRootNamespace(),
+                $this->setType($testType, $variation, $path)
+            ));
         }
     }
 
-    private function setPaths(string $type, string $name, array $options, mixed $extra = false): array
+    private function setPaths(string $type, string $name, string $variation, mixed $extra = false): array
     {
-        return FilePathService::compose($options, CollectTypes::_($type), $name ?: $this->file, $extra);
+        return FilePathService::compose($this->package, CollectTypes::_($type), $variation, $name ?: $this->file, $extra);
     }
 
-    private function basePath($options)
+    private function basePath()
     {
-        if (!$options['missingPackage']) return $this->testPackage['path'];
+        if ($this->package == $this->testPackage['name']) return $this->testPackage['path'];
 
         return implode(
             DIRECTORY_SEPARATOR,
@@ -134,6 +126,19 @@ class FileTestService extends TestCase
             $this->testPackage['folder'],
             $this->testPackage['name']
         ]);
+    }
+
+    private function setRootNamespace()
+    {
+        return match (true) {
+            $this->scenario['sp'] => Settings::identity('namespace'),
+            $this->scenario['sl'] => '',
+            $this->package == $this->fakePackage => '',
+            default => Path::glue(array_map(
+                fn ($x) => ucfirst($x),
+                array_filter([$this->testPackage['namespace'], $this->testPackage['name']])
+            ), '\\')
+        };
     }
 
     protected function setType(string $testType, string $variation, string $path, string $file = ''): array

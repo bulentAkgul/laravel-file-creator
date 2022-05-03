@@ -6,11 +6,11 @@ use Bakgul\FileCreator\Tests\TestServices\AssertionServices\CommandsAssertionSer
 
 class RuleAssertionService extends CommandsAssertionService
 {
-    public function default(string $path): array
+    public function default(string $path, string $rootNamespace): array
     {
         return $this->assert(
             [
-                2 => 'namespace CurrentTest\Testing\Rules;',
+                2 => $this->setNamespace($rootNamespace, 'src', 'Rules'),
                 4 => 'use Illuminate\Contracts\Validation\Rule;',
                 6 => 'class {{ name }}Rule implements Rule',
             ],
@@ -21,11 +21,11 @@ class RuleAssertionService extends CommandsAssertionService
         );
     }
 
-    public function implicit(string $path): array
+    public function implicit(string $path, string $rootNamespace): array
     {
         return $this->assert(
             [
-                2 => 'namespace CurrentTest\Testing\Rules;',
+                2 => $this->setNamespace($rootNamespace, 'src', 'Rules'),
                 4 => 'use Illuminate\Contracts\Validation\ImplicitRule;',
                 6 => 'class {{ name }}Rule implements ImplicitRule',
             ],

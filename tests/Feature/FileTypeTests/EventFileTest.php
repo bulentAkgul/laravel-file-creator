@@ -2,9 +2,6 @@
 
 namespace Bakgul\FileCreator\Tests\Feature\FileTypeTests;
 
-use Bakgul\Kernel\Helpers\Text;
-use Bakgul\Kernel\Helpers\Convention;
-use Bakgul\FileCreator\Tests\TestServices\AssertionServices\CommandsAssertionService;
 use Bakgul\FileCreator\Tests\TestServices\ExecutionServices\FileTestService;
 
 class EventFileTest extends FileTestService

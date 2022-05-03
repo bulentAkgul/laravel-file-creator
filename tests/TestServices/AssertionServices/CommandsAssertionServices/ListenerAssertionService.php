@@ -6,11 +6,11 @@ use Bakgul\FileCreator\Tests\TestServices\AssertionServices\CommandsAssertionSer
 
 class ListenerAssertionService extends CommandsAssertionService
 {
-    public function default(string $path): array
+    public function default(string $path, string $rootNamespace): array
     {
         return $this->assert(
             [
-                2 => 'namespace CurrentTest\Testing\Listeners;',
+                2 => $this->setNamespace($rootNamespace, 'src', 'Listeners'),
                 7 => 'class {{ name }}',
             ],
             [

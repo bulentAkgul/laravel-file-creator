@@ -6,11 +6,11 @@ use Bakgul\FileCreator\Tests\TestServices\AssertionServices\CommandsAssertionSer
 
 class MiddlewareAssertionService extends CommandsAssertionService
 {
-    public function default(string $path): array
+    public function default(string $path, string $rootNamespace): array
     {
         return $this->assert(
             [
-                2 => 'namespace CurrentTest\Testing\Middleware;',
+                2 => $this->setNamespace($rootNamespace, 'src', 'Middleware'),
                 7 => 'class {{ name }}',
                 9 => 'public function handle(Request $request, Closure $next): mixed'
             ],

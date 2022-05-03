@@ -6,11 +6,11 @@ use Bakgul\FileCreator\Tests\TestServices\AssertionServices\CommandsAssertionSer
 
 class ExceptionAssertionService extends CommandsAssertionService
 {
-    public function default(string $path): array
+    public function default(string $path, string $rootNamespace): array
     {
         return $this->assert(
             [
-                2 => 'namespace CurrentTest\Testing\Exceptions;',
+                2 => $this->setNamespace($rootNamespace, 'src', 'Exceptions'),
                 6 => 'class {{ name }}Exception extends Exception'
             ],
             [

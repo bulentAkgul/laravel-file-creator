@@ -6,11 +6,11 @@ use Bakgul\FileCreator\Tests\TestServices\AssertionServices\CommandsAssertionSer
 
 class CastAssertionService extends CommandsAssertionService
 {
-    public function default(string $path): array
+    public function default(string $path, string $rootNamespace): array
     {
         return $this->assert(
             [
-                2 => 'namespace CurrentTest\Testing\Casts;',
+                2 => $this->setNamespace($rootNamespace, 'src', 'Casts'),
                 6 => 'class {{ name }}Cast implements CastsAttributes',
                 13 => 'public function set($model, string $key, mixed $value, array $attributes): mixed'
             ],

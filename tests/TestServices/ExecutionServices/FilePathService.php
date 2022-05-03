@@ -18,10 +18,12 @@ class FilePathService
     private static $name = 'post';
     private static $extraName = 'Article';
     private static $family;
+    private static $variation;
 
-    public static function compose(array $options, array $types, string $name = '', mixed $extra = false)
+    public static function compose(string $package, array $types, string $variation, string $name = '', mixed $extra = false)
     {
-        self::setFamily($options);
+        self::$variation = $variation;
+        self::setFamily($package);
 
         return array_filter(Arry::unique(Arr::flatten(array_map(
             fn ($x) => self::callType($x, $name, $extra),
@@ -29,12 +31,12 @@ class FilePathService
         ))));
     }
 
-    private static function setFamily(array $options)
+    private static function setFamily(string $package)
     {
         self::$family = match (true) {
             Settings::standalone('package') => 'src',
             Settings::standalone('laravel') => 'app',
-            default => $options['unknownPackage'] ? 'app' : 'src'
+            default => $package == 'x' ? 'app' : 'src'
         };
     }
 
@@ -237,9 +239,9 @@ class FilePathService
         );
     }
 
-    public static function test($name, $variation)
+    public static function test($name)
     {
-        return ["tests" . Text::wrap(ucfirst($variation)) . "{$name}Test.php"];
+        return ["tests" . Text::wrap(ucfirst(self::$variation)) . "{$name}Test.php"];
     }
 
     public static function trait($name)

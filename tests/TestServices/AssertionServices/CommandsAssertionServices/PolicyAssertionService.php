@@ -6,15 +6,15 @@ use Bakgul\FileCreator\Tests\TestServices\AssertionServices\CommandsAssertionSer
 
 class PolicyAssertionService extends CommandsAssertionService
 {
-    public function default(string $path): array
+    public function default(string $path, string $rootNamespace): array
     {
         $name = $this->setName($path, 'Policy.php');
         $i = $name != 'User' ? 1 : 0;
 
         return $this->assert(
             [
-                2 => 'namespace CurrentTest\Testing\Policies;',
-                6 => 'use CurrentTest\Testing\Models\{{ name }};',
+                2 => $this->setNamespace($rootNamespace, 'src', 'Policies'),
+                6 => $this->setNamespace($rootNamespace, 'src', 'Models', 'use') . '\{{ name }};',
                 8 + $i => 'class {{ name }}Policy',
                 17 + $i => 'public function view(User $user, {{ name }} ${{ var }}): Response|bool',
                 37 + $i => 'public function restore(User $user, {{ name }} ${{ var }}): Response|bool',

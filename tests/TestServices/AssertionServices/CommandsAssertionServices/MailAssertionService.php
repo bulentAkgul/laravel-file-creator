@@ -6,11 +6,11 @@ use Bakgul\FileCreator\Tests\TestServices\AssertionServices\CommandsAssertionSer
 
 class MailAssertionService extends CommandsAssertionService
 {
-    public function default(string $path): array
+    public function default(string $path, string $rootNamespace): array
     {
         return $this->assert(
             [
-                2 => 'namespace CurrentTest\Testing\Mails;',
+                2 => $this->setNamespace($rootNamespace, 'src', 'Mails'),
                 6 => 'use Illuminate\Mail\Mailable;',
                 9 => 'class {{ name }}Mail extends Mailable',
                 20 => 'return $this->view('. "'view.name'" . ');'
@@ -22,11 +22,11 @@ class MailAssertionService extends CommandsAssertionService
         );
     }
 
-    public function markdown(string $path): array
+    public function markdown(string $path, string $rootNamespace): array
     {
         return $this->assert(
             [
-                2 => 'namespace CurrentTest\Testing\Mails;',
+                2 => $this->setNamespace($rootNamespace, 'src', 'Mails'),
                 6 => 'use Illuminate\Mail\Mailable;',
                 9 => 'class {{ name }}Mail extends Mailable',
                 20 => 'return $this->markdown(' . "'DummyView'" . ');'

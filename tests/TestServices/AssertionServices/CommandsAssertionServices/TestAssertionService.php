@@ -7,16 +7,16 @@ use Bakgul\FileCreator\Tests\TestServices\AssertionServices\CommandsAssertionSer
 
 class TestAssertionService extends CommandsAssertionService
 {
-    public function default(string $path): array
+    public function default(string $path, string $rootNamespace): array
     {
-        return $this->{Settings::default('files', 'test.variations')}($path);
+        return $this->{Settings::default('files', 'test.variations')}($path, $rootNamespace);
     }
     
-    public function feature(string $path): array
+    public function feature(string $path, string $rootNamespace): array
     {
         return $this->assert(
             [
-                2 => 'namespace CurrentTest\Testing\Tests\Feature;',
+                2 => $this->setNamespace($rootNamespace, 'tests', 'Tests\Feature'),
                 6 => 'use CurrentTest\Testing\Tests\TestCase;',
                 8 => 'class {{ name }}Test extends TestCase'
             ],
@@ -27,11 +27,11 @@ class TestAssertionService extends CommandsAssertionService
         );
     }
 
-    public function unit(string $path): array
+    public function unit(string $path, string $rootNamespace): array
     {
         return $this->assert(
             [
-                2 => 'namespace CurrentTest\Testing\Tests\Unit;',
+                2 => $this->setNamespace($rootNamespace, 'tests', 'Tests\Unit'),
                 4 => 'use PHPUnit\Framework\TestCase;',
                 6 => 'class {{ name }}Test extends TestCase'
             ],

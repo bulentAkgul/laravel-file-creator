@@ -7,14 +7,14 @@ use Bakgul\FileCreator\Tests\TestServices\AssertionServices\CommandsAssertionSer
 
 class ServiceAssertionService extends CommandsAssertionService
 {
-    public function default(string $path, array $type, string $parent): array
+    public function default(string $path, string $rootNamespace, array $type, string $parent): array
     {
         $name = $this->setName($path, 'Service.php');
         $task = $this->setTask($name);
 
         return $this->assert(
             [
-                2 => 'namespace CurrentTest\Testing\Services' . ($task ? '\{{ name }}Services' : '') . ';',
+                2 => $this->setNamespace($rootNamespace, 'src', 'Services' . ($task ? '\{{ name }}Services' : '')),
                 4 => 'class {{ task }}{{ name }}Service',
                 6 => 'public function handle({{ args }})'
             ],

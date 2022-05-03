@@ -7,11 +7,11 @@ use Bakgul\FileCreator\Tests\TestServices\AssertionServices\CommandsAssertionSer
 
 class TraitAssertionService extends CommandsAssertionService
 {
-    public function default(string $path): array
+    public function default(string $path, string $rootNamespace): array
     {
         return $this->assert(
             [
-                2 => 'namespace CurrentTest\Testing\\' . Settings::folders('trait') . ';',
+                2 => $this->setNamespace($rootNamespace, 'src', Settings::folders('trait')),
                 4 => 'trait {{ name }}',
             ],
             [

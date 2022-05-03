@@ -6,11 +6,11 @@ use Bakgul\FileCreator\Tests\TestServices\AssertionServices\CommandsAssertionSer
 
 class NotificationAssertionService extends CommandsAssertionService
 {
-    public function default(string $path): array
+    public function default(string $path, string $rootNamespace): array
     {
         return $this->assert(
             [
-                2 => 'namespace CurrentTest\Testing\Notifications;',
+                2 => $this->setNamespace($rootNamespace, 'src', 'Notifications'),
                 9 => 'class {{ name }}Notification extends Notification',
                 23 => 'public function toMail(mixed $notifiable): MailMessage'
             ],
@@ -21,11 +21,11 @@ class NotificationAssertionService extends CommandsAssertionService
         );
     }
 
-    public function markdown(string $path): array
+    public function markdown(string $path, string $rootNamespace): array
     {
         return $this->assert(
             [
-                2 => 'namespace CurrentTest\Testing\Notifications;',
+                2 => $this->setNamespace($rootNamespace, 'src', 'Notifications'),
                 9 => 'class {{ name }}Notification extends Notification',
                 25 => 'return (new MailMessage)->markdown('. "'DummyView'" . ');'
             ],

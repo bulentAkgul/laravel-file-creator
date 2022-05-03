@@ -6,11 +6,11 @@ use Bakgul\FileCreator\Tests\TestServices\AssertionServices\CommandsAssertionSer
 
 class CommandAssertionService extends CommandsAssertionService
 {
-    public function default(string $path): array
+    public function default(string $path, string $rootNamespace): array
     {
         return $this->assert(
             [
-                2 => 'namespace CurrentTest\Testing\Commands;',
+                2 => $this->setNamespace($rootNamespace, 'src', 'Commands'),
                 6 => 'class {{ name }}Command extends Command',
                 10 => 'protected $description = '. "'Command description'" . ';'
             ],

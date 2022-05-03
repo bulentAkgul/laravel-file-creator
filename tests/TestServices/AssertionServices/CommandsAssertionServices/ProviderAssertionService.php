@@ -8,16 +8,25 @@ use Bakgul\FileCreator\Tests\TestServices\AssertionServices\CommandsAssertionSer
 
 class ProviderAssertionService extends CommandsAssertionService
 {
-    public function default(string $path): array
-    {
-        return [true, ''];
-    }
-
-    public function event(string $path, $type, $files): array
+    public function default(string $path, string $rootNamespace): array
     {
         return $this->assert(
             [
-                2 => 'namespace CurrentTest\Testing\Providers;',
+                2 => $this->setNamespace($rootNamespace, 'src', 'Providers'),
+                6 => 'class {{ name }}ServiceProvider extends ServiceProvider',
+            ],
+            [
+                'name' => $this->setName($path, 'ServiceProvider.php')
+            ],
+            $path
+        );
+    }
+
+    public function event(string $path, string $rootNamespace): array
+    {
+        return $this->assert(
+            [
+                2 => $this->setNamespace($rootNamespace, 'src', 'Providers'),
                 6 => 'class EventServiceProvider extends ServiceProvider',
                 8 => 'protected $listen = [];'
             ],

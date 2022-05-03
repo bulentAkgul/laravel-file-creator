@@ -3,7 +3,6 @@
 namespace Bakgul\FileCreator\Tests\Feature\FileTypeTests;
 
 use Bakgul\FileCreator\Tests\TestServices\ExecutionServices\FileTestService;
-use Bakgul\FileCreator\Tests\TestServices\ExecutionServices\FilePathService;
 
 class MigrationFileTest extends FileTestService
 {
