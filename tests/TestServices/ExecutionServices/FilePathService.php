@@ -239,7 +239,7 @@ class FilePathService
 
     public static function test($name, $variation)
     {
-        return ["tests" . Text::inject(ucfirst($variation)) . "{$name}Test.php"];
+        return ["tests" . Text::wrap(ucfirst($variation)) . "{$name}Test.php"];
     }
 
     public static function trait($name)

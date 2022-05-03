@@ -52,6 +52,6 @@ class ServiceRequestService extends SrcRequestService
     {
         return str_contains($map['args'], '$' . $map['var'])
             ? ''
-            : Text::inject($this->replace($map, 'use {{ root_namespace }}\Models\{{ name }};'), PHP_EOL);
+            : Text::wrap($this->replace($map, 'use {{ root_namespace }}\Models\{{ name }};'), PHP_EOL);
     }
 }
