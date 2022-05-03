@@ -1,6 +1,6 @@
 {
   "name": "bakgul/laravel-file-creator",
-  "description": "Create Laravel files easily.",
+  "description": "Create PHP files in packages or Laravel repository",
   "authors": [
     {
       "name": "Bulent Akgul",
