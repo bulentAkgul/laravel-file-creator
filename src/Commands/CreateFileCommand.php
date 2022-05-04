@@ -9,12 +9,13 @@ use Bakgul\Kernel\Tasks\MakeFileList;
 use Bakgul\Evaluator\Concerns\ShouldBeEvaluated;
 use Bakgul\Evaluator\Services\FileCommandEvaluationService;
 use Bakgul\FileCreator\Services\FileService;
+use Bakgul\FileHistory\Concerns\HasHistory;
 use Bakgul\Kernel\Helpers\Settings;
 use Illuminate\Console\Command;
 
 class CreateFileCommand extends Command
 {
-    use HasPreparation, HasRequest, Sharable, ShouldBeEvaluated;
+    use HasHistory, HasPreparation, HasRequest, Sharable, ShouldBeEvaluated;
 
     protected $signature = '
         create:file
@@ -43,6 +44,8 @@ class CreateFileCommand extends Command
             $this->evaluate();
             if ($this->stop()) return $this->terminate();
         }
+
+        $this->logFile();
 
         $this->createFiles(MakeFileList::_($this->request));
     }
