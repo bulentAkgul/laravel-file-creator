@@ -17,12 +17,12 @@ class RequestFileTest extends FileTestService
     /** @test */
     public function request_store()
     {
-        $this->start('', $this->testType, $this->file, 'store');
+        $this->start('', $this->testType, $this->file, ['task' => 'store']);
     }
 
     /** @test */
     public function request_update()
     {
-        $this->start('', $this->testType, $this->file, 'update');
+        $this->start('', $this->testType, $this->file, ['task' => 'update']);
     }
 }

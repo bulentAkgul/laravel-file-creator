@@ -9,7 +9,6 @@ use Bakgul\Kernel\Tasks\CollectTypes;
 use Bakgul\Kernel\Tests\Tasks\SetupTest;
 use Bakgul\FileCreator\Tests\TestServices\AssertionServices\CommandsAssertionService;
 use Bakgul\Kernel\Helpers\Arry;
-use Bakgul\Kernel\Helpers\Convention;
 use Bakgul\Kernel\Tasks\ConvertCase;
 use Bakgul\Kernel\Tests\Services\TestDataService;
 use Bakgul\Kernel\Tests\TestCase;
@@ -32,39 +31,38 @@ class FileTestService extends TestCase
         parent::__construct();
     }
 
-    public function start($variation, $testType, $name = '', $extra = false, $append = '')
+    public function start($variation, $testType, $name = '', $extra = [])
     {
         $this->testPackage = (new SetupTest)($this->scenario);
 
-        $command = $this->command($testType, $variation, $name, $extra, $append);
+        $command = $this->command($testType, $variation, $name, $extra);
 
         $this->runCommand($command);
 
         $this->execute($variation, $testType, $name, $extra);
     }
 
-    private function command(string $type, string $variation, string $name, $task, $append)
+    private function command(string $type, string $variation, string $name, array $extra)
     {
         $isAlone = array_reduce([$this->scenario['sl'], $this->scenario['sp']], fn ($p, $c) => $p || $c, false);
 
         $this->package($isAlone);
 
-        $task = $task == 'taskless' ? $task : (in_array($task, Settings::files("{$type}.tasks")) ? $task : '');
+        $this->setTask($extra);
 
         return implode(' ', array_filter([
             "create:file",
-            $this->name($name, $task),
+            $this->name($name),
             $type . Text::append($variation, ':'),
             $this->package,
-            $append,
-            $task == 'taskless' ? '-t' : '',
+            Arry::get($extra, 'append') ?? '',
+            $this->task == 'taskless' ? '-t' : '',
         ]));
     }
 
-    private function name(string $name = '', array|bool|string $task = '')
+    private function name(string $name = '')
     {
-        return ($name ?: $this->file)
-            . Text::append(is_string($task) && $task != 'taskless' ? $task : '', ':');
+        return ($name ?: $this->file) . Text::append($this->task == 'taskless' ? '' : $this->task, ':');
     }
 
     private function package(bool $isAlone): void
@@ -72,6 +70,11 @@ class FileTestService extends TestCase
         $this->package = !$isAlone
             ? ($this->scenario['root'] ? $this->testPackage['name'] : $this->fakePackage)
             : '';
+    }
+
+    private function setTask($extra)
+    {
+        $this->task = Arry::get($extra, 'task') ?? '';
     }
 
     private function runCommand($command)
@@ -88,20 +91,24 @@ class FileTestService extends TestCase
     {
         $asserter = new CommandsAssertionService;
 
-        foreach ($this->setPaths($testType, $name, $variation, $extra) as $path) {
+        $extra['paths'] = $this->setPaths($testType, $name, $variation, $extra);
+
+        foreach ($extra['paths'] as $path) {
+            $extra['type'] = $this->setType($testType, $variation, $path);
+            
             $fullPath = Path::glue([$this->basePath(), $path]);
 
             $this->assertFileExists($fullPath);
-            
+
             $this->assertTrue(...$asserter->handle(
                 $fullPath,
                 $this->setRootNamespace(),
-                $this->setType($testType, $variation, $path)
+                $extra
             ));
         }
     }
 
-    private function setPaths(string $type, string $name, string $variation, mixed $extra = false): array
+    private function setPaths(string $type, string $name, string $variation, array $extra): array
     {
         return FilePathService::compose($this->package, CollectTypes::_($type), $variation, $name ?: $this->file, $extra);
     }
@@ -143,13 +150,22 @@ class FileTestService extends TestCase
 
     protected function setType(string $testType, string $variation, string $path, string $file = ''): array
     {
-        $path = Text::serialize($path);
-
         return [
-            'name' => $n = Convention::class($path[$path[0] != 'tests']),
+            'name' => $n = $this->setTypeName(Text::serialize($path)),
             'variation' => $this->setVariation($testType, $variation, $file, $n),
             'test_variation' => $variation
         ];
+    }
+
+    private function setTypeName(array $path)
+    {
+        foreach ($path as $folder) {
+            $container = lcfirst(Str::singular($folder));
+            if (Settings::files($container)) return ucfirst($container);
+
+            $container = Arry::find(Settings::folders(), $folder, nullable: false)['key'];
+            if ($container) return ucfirst($container);
+        }
     }
 
     private function setVariation(string $testType, string $variation, string $file, string $type): string

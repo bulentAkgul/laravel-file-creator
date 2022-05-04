@@ -2,6 +2,7 @@
 
 namespace Bakgul\FileCreator\Tasks;
 
+use Bakgul\Kernel\Helpers\Package;
 use Bakgul\Kernel\Helpers\Settings;
 
 class ModifyFilePointer
@@ -31,7 +32,7 @@ class ModifyFilePointer
             !str_contains($attr['path_schema'], 'wrapper') => false,
             Settings::standalone('laravel') => false,
             Settings::standalone('package') => Settings::main('expand_http_in_packages'),
-            default => $attr['package'] && Settings::main('expand_http_in_packages')
+            default => Settings::main('expand_http_in_packages') && Package::root($attr['package'])
         };
     }
 }

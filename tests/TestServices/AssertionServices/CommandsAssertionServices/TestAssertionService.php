@@ -14,14 +14,18 @@ class TestAssertionService extends CommandsAssertionService
     
     public function feature(string $path, string $rootNamespace): array
     {
+        $name = $this->setName($path, 'Test.php');
+        $task = $this->setTask($name);
+
         return $this->assert(
             [
-                2 => $this->setNamespace($rootNamespace, 'tests', 'Tests\Feature'),
-                6 => 'use CurrentTest\Testing\Tests\TestCase;',
-                8 => 'class {{ name }}Test extends TestCase'
+                2 => $this->setNamespace($rootNamespace, 'tests', 'Feature' . ($task ? '\{{ name }}Tests' : '')),
+                6 => $this->setNamespace($rootNamespace, 'tests', 'TestCase', 'use') . ';',
+                8 => 'class {{ task }}{{ name }}Test extends TestCase'
             ],
             [
-                'name' => $this->setName($path, 'Test.php')
+                'name' => str_replace($task, '', $name),
+                'task' => $task,
             ],
             $path
         );
@@ -31,7 +35,7 @@ class TestAssertionService extends CommandsAssertionService
     {
         return $this->assert(
             [
-                2 => $this->setNamespace($rootNamespace, 'tests', 'Tests\Unit'),
+                2 => $this->setNamespace($rootNamespace, 'tests', 'Unit'),
                 4 => 'use PHPUnit\Framework\TestCase;',
                 6 => 'class {{ name }}Test extends TestCase'
             ],

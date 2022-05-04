@@ -10,7 +10,7 @@ class MiddlewareAssertionService extends CommandsAssertionService
     {
         return $this->assert(
             [
-                2 => $this->setNamespace($rootNamespace, 'src', 'Middleware'),
+                2 => $this->setNamespace($rootNamespace, 'src', 'Middleware', wrap: 'Http'),
                 7 => 'class {{ name }}',
                 9 => 'public function handle(Request $request, Closure $next): mixed'
             ],

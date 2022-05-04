@@ -10,25 +10,51 @@ use Bakgul\Kernel\Tasks\ConvertCase;
 
 class CommandsAssertionService
 {
-    public function handle(string $path, string $rootNamespace, array $type, string $files = '')
+    public function handle(string $path, string $rootNamespace, array $extra)
     {
-        $asserter = ucfirst(
-            (Arry::find(Settings::folders(), $type['name']) ?? ['key' => $type['name']])['key']
-        );
-
         return call_user_func_array(
-            [new (__NAMESPACE__ . "\CommandsAssertionServices\\{$asserter}AssertionService"), ConvertCase::camel($type['variation'])],
-            [$path, $rootNamespace, $type, $files]
+            [new (__NAMESPACE__ . "\CommandsAssertionServices\\{$extra['type']['name']}AssertionService"), ConvertCase::camel($extra['type']['variation'])],
+            [$path, $rootNamespace, $extra]
         );
     }
 
-    protected function setNamespace(string $rootNamespace, string $family, string $tail, string $head = 'namespace')
+    protected function setNamespace(
+        string $rootNamespace,
+        string $family,
+        string|array $tail,
+        string $head = 'namespace',
+        string $wrap = ''
+    ): string {
+        return "{$head} " . Path::glue(array_filter([
+            $rootNamespace,
+            $this->family($family, $rootNamespace),
+            $this->wrap($wrap, $rootNamespace),
+            ...$this->tail($tail),
+        ]), '\\') . ($head == 'namespace' ? ';' : '');
+    }
+
+    private function family($family, $rootNamespace)
     {
-        return "{$head} " . ($rootNamespace == ''
-            ? Path::glue([ucfirst($family == 'src' ? 'app' : $family), $tail], '\\')
-            : Path::glue(array_filter([
-                $rootNamespace, ucfirst($family == 'src' ? '' : $family), $tail
-            ]), '\\')) . ($head == 'namespace' ? ';' : '');
+        return ucfirst(match (true) {
+            $family == 'src' => $rootNamespace ? '' : 'app',
+            default => $family
+        });
+    }
+
+    private function wrap($wrap, $rootNamespace)
+    {
+        return ucfirst(match (true) {
+            $wrap == '' => '',
+            Settings::standalone('laravel') => $wrap,
+            !$rootNamespace => $wrap,
+            Settings::main('expand_http_in_packages') => '',
+            default => $wrap
+        });
+    }
+
+    private function tail($tail)
+    {
+        return is_string($tail) ? [$tail] : $tail;
     }
 
     protected function setName(string $path, string $search): string
@@ -58,7 +84,7 @@ class CommandsAssertionService
         return [true, ''];
     }
 
-    private function message($path, $expected, $found, $line)
+    protected function message($path, $expected, $found, $line)
     {
         return "Expectation on Line {$line}:" . PHP_EOL
             . "\t{$expected}" . PHP_EOL

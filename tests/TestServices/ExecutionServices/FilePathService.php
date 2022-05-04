@@ -19,10 +19,13 @@ class FilePathService
     private static $extraName = 'Article';
     private static $family;
     private static $variation;
+    private static $types;
 
-    public static function compose(string $package, array $types, string $variation, string $name = '', mixed $extra = false)
+    public static function compose(string $package, array $types, string $variation, string $name, array $extra)
     {
         self::$variation = $variation;
+        self::$types = $types;
+
         self::setFamily($package);
 
         return array_filter(Arry::unique(Arr::flatten(array_map(
@@ -72,13 +75,11 @@ class FilePathService
 
     public static function controller($name, $extra)
     {
-        $extra = is_bool($extra) ? ['parent' => $extra, 'api' => $extra] : $extra;
-
         return [
             Path::glue(array_filter([
                 self::$family, self::http('controller'), 'Controllers', 'Admin', $extra['api'] ? Settings::folders('api') : '', "{$name}Controller.php"
             ])),
-            ...self::parents(['migration', 'policy', 'model', 'factory', 'seeder'], $extra['parent'])
+            ...self::parents(['migration', 'policy', 'model', 'factory', 'seeder'], $extra)
         ];
     }
 
@@ -97,7 +98,7 @@ class FilePathService
         return [Path::glue(array_filter([self::$family, self::http('event'), 'Events', "{$name}.php"]))];
     }
 
-    public static function factory($name, $extra = false, $policy = false)
+    public static function factory($name, $extra = [], $policy = false)
     {
         return self::isExtra($extra, 'parent') ? [
             Path::glue(['database', 'factories', self::$extraName . 'Factory.php'])
@@ -132,7 +133,7 @@ class FilePathService
         return [Path::glue(array_filter([self::$family, self::http('middleware'), 'Middleware', "{$name}.php"]))];
     }
 
-    public static function migration($name, $extra = false, $policy = false)
+    public static function migration($name, $extra = [], $policy = false)
     {
         $d = Carbon::today()->format('Y_m_d');
 
@@ -144,7 +145,7 @@ class FilePathService
         ];
     }
 
-    public static function model($name, $extra = false)
+    public static function model($name, $extra = [])
     {
         return self::isExtra($extra, 'parent') ? [
             Path::glue(
@@ -162,7 +163,7 @@ class FilePathService
         return [Path::glue(array_filter([self::$family, self::http('notification'), 'Notifications', "{$name}Notification.php"]))];
     }
 
-    public static function observer($name, $extra = false)
+    public static function observer($name, $extra = [])
     {
         return self::isExtra($extra, 'parent') ? [
             Path::glue(
@@ -175,7 +176,7 @@ class FilePathService
         ];
     }
 
-    public static function policy($name, $extra = false)
+    public static function policy($name, $extra = [])
     {
         return self::isExtra($extra, 'parent') ? [
             Path::glue(
@@ -193,11 +194,14 @@ class FilePathService
         return [Path::glue(array_filter([self::$family, self::http('provider'), 'Providers', "{$name}ServiceProvider.php"]))];
     }
 
-    public static function request($name, $task)
+    public static function request($name, $extra)
     {
+        $task = Arry::get($extra, 'task') ?: '';
+        $tasks = Settings::files('request.tasks');
+
         return array_map(
-            fn ($x) => Path::glue(array_filter([self::$family, self::http('request'), 'Requests', $task ? "{$name}Requests" : '', ($task ? ucfirst($x) : '') . "{$name}Request.php"])),
-            is_string($task) ? [$task] : Settings::files('request.tasks')
+            fn ($x) => Path::glue(array_filter([self::$family, self::http('request'), 'Requests', "{$name}Requests", ucfirst($x) . "{$name}Request.php"])),
+            $task ? array_intersect(explode('.', $task), $tasks) : $tasks
         );
     }
 
@@ -211,7 +215,7 @@ class FilePathService
         return [Path::glue(array_filter([self::$family, self::http('rule'), 'Rules', "{$name}Rule.php"]))];
     }
 
-    public static function seeder($name, $extra = false, $policy = false)
+    public static function seeder($name, $extra = [], $policy = false)
     {
         return self::isExtra($extra, 'parent') ? [
             Path::glue(['database', 'seeders', self::$extraName . 'Seeder.php'])
@@ -221,27 +225,44 @@ class FilePathService
         ];
     }
 
-    public static function service($name, $mode)
+    public static function service($name, $extra)
     {
-        $mode = is_array($mode) ? $mode['api'] : $mode;
-        $tasks = Settings::main('tasks');
+        $typeTasks = Settings::files('service.tasks');
+        $task = explode('.', Arry::get($extra, 'task') ?? '');
+        $tasks = Settings::main("tasks." . (Arry::get($extra, 'api') ? 'api' : 'all'));
 
         return array_map(
             fn ($x) => Path::glue(array_filter([
-                self::$family, self::http('service'), 'Services', $x == 'Taskless' ? '' : "{$name}Services", ($x == 'Taskless' ? '' : $x) . "{$name}Service.php"
+                self::$family, self::http('service'), 'Services', $x ? "{$name}Services" : '', "{$x}{$name}Service.php"
             ])),
             array_map(
                 fn ($x) => ucfirst($x),
-                $mode === 'not'
-                    ? array_diff($tasks['all'], $tasks['api'])
-                    : (is_string($mode) ? [$mode] : $tasks[$mode ? 'api' : 'all'])
+                $task[0] == 'taskless'
+                    ? (self::$types[0]['type'] == 'controller' ? [] : [''])
+                    : (array_filter($task)
+                        ? array_intersect($task, $tasks, $typeTasks)
+                        : array_intersect($tasks, $typeTasks)
+                    )
             )
         );
     }
 
-    public static function test($name)
+    public static function test($name, $extra)
     {
-        return ["tests" . Text::wrap(ucfirst(self::$variation)) . "{$name}Test.php"];
+        $task = explode('.', Arry::get($extra, 'task') ?? '');
+
+        if (self::$variation == 'unit' || $task[0] == 'taskless') {
+            return ["tests" . Text::wrap(ucfirst(self::$variation)) . "{$name}Test.php"];
+        }
+
+        $tasks = Settings::files('test.tasks', fn ($x) => $x);
+
+        return array_map(
+            fn ($x) => Path::glue(
+                ['tests', 'Feature', "{$name}Tests", ucfirst($x) . "{$name}Test.php"]
+            ),
+            array_filter($task) ? array_intersect($task, $tasks) : $tasks
+        );
     }
 
     public static function trait($name)
@@ -251,12 +272,15 @@ class FilePathService
 
     private static function isExtra($extra, $key)
     {
-        return is_array($extra) ? Arry::get($extra, $key) ?? false : $extra;
+        return Arry::get($extra, $key) ?? false;
     }
 
-    private static function parents($types, $hasParent)
+    private static function parents($types, $extra)
     {
-        return $hasParent ? Arr::flatten(array_map(fn ($x) => self::$x('', true), $types)) : [];
+        return Arry::get($extra, 'parent') ? Arr::flatten(array_map(
+            fn ($x) => self::$x('', $extra),
+            $types
+        )) : [];
     }
 
     private static function http($type)

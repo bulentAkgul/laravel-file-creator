@@ -17,6 +17,6 @@ class ListenerFileTest extends FileTestService
     /** @test */
     public function listener_default()
     {
-        $this->start('', $this->testType, $this->file, append: "--parent={$this->file}");
+        $this->start('', $this->testType, $this->file, ['append' => "--parent={$this->file}"]);
     }
 }

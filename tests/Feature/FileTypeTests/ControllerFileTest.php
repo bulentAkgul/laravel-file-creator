@@ -18,41 +18,41 @@ class ControllerFileTest extends FileTestService
     /** @test */
     public function controller_default()
     {
-        $this->start('', $this->testType, $this->file, $this->extra(false, false), 'admin');
+        $this->start('', $this->testType, $this->file, $this->extra('admin', false, '', false));
     }
 
     /** @test */
     public function controller_api()
     {
-        $this->start('api', $this->testType, $this->file, $this->extra(true, false), 'admin');
+        $this->start('api', $this->testType, $this->file, $this->extra('admin', true, '', false));
     }
 
     /** @test */
     public function controller_invokable()
     {
-        $this->start('invokable', $this->testType, $this->file, $this->extra(false, false), 'admin');
+        $this->start('invokable', $this->testType, $this->file, $this->extra('admin', false, 'taskless', false));
     }
 
     /** @test */
     public function controller_nested_api()
     {
-        $this->start('nested-api', $this->testType, $this->file, $this->extra(true, true), "admin -p={$this->parent}");
+        $this->start('nested-api', $this->testType, $this->file, $this->extra("admin -p={$this->parent}", true, 'index.store', true));
     }
 
     /** @test */
     public function controller_nested_default()
     {
-        $this->start('nested', $this->testType, $this->file, $this->extra(false, true), "admin -p={$this->parent}");
+        $this->start('nested', $this->testType, $this->file, $this->extra("admin -p={$this->parent}", false, '', true));
     }
 
     /** @test */
     public function controller_plain()
     {
-        $this->start('plain', $this->testType, $this->file, $this->extra(false, false), 'admin');
+        $this->start('plain', $this->testType, $this->file, $this->extra('admin', false, '', false));
     }
 
-    private function extra(bool $api, bool $parent): array
+    private function extra(string $append, bool $api, string $task, bool $parent): array
     {
-        return  ['api' => $api, 'parent' => $parent];
+        return  ['append' => $append, 'api' => $api, 'parent' => $parent, 'task' => $task];
     }
 }

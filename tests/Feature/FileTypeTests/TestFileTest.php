@@ -22,15 +22,21 @@ class TestFileTest extends FileTestService
     }
 
     /** @test */
-    public function test_feature()
+    public function test_feature_default()
     {
         $this->start('feature', $this->testType, $this->file);
     }
 
     /** @test */
+    public function test_feature_store()
+    {
+        $this->start('feature', $this->testType, $this->file, ['task' => 'store']);
+    }
+
+    /** @test */
     public function test_feature_taskless()
     {
-        $this->start('feature', $this->testType, $this->file, 'taskless');
+        $this->start('feature', $this->testType, $this->file, ['task' => 'taskless']);
     }
 
     /** @test */

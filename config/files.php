@@ -35,7 +35,7 @@ return [
         'family' => 'tests',
         'path_schema' => '{{ variation }}{{ folder }}{{ subs }}',
         'tasks' => ['', 'index', 'show', 'create', 'store', 'edit', 'update', 'destroy'],
-        'variations' => ['feature', 'unit'],
+        'variations' => ['feature', 'feature-api', 'unit'],
         'pairs' => [],
     ],
     'action' => [
