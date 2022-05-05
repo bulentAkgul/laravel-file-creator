@@ -2,7 +2,7 @@
 
 namespace Bakgul\FileCreator\Tests\TestServices\AssertionServices;
 
-use Bakgul\Kernel\Helpers\Arry;
+use Bakgul\Kernel\Helpers\Convention;
 use Bakgul\Kernel\Helpers\Path;
 use Bakgul\Kernel\Helpers\Settings;
 use Bakgul\Kernel\Helpers\Text;
@@ -55,6 +55,11 @@ class CommandsAssertionService
     private function tail($tail)
     {
         return is_string($tail) ? [$tail] : $tail;
+    }
+
+    protected function convertTail(array $subs)
+    {
+        return array_map(fn ($x) => Convention::namespace($x, null), $subs);
     }
 
     protected function setName(string $path, string $search): string

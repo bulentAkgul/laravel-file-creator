@@ -52,7 +52,7 @@ class FileTestService extends TestCase
 
         return implode(' ', array_filter([
             "create:file",
-            $this->name($name),
+            $this->name($name, $extra),
             $type . Text::append($variation, ':'),
             $this->package,
             Arry::get($extra, 'append') ?? '',
@@ -60,9 +60,12 @@ class FileTestService extends TestCase
         ]));
     }
 
-    private function name(string $name = '')
+    private function name(string $name = '', array $extra = [])
     {
-        return ($name ?: $this->file) . Text::append($this->task == 'taskless' ? '' : $this->task, ':');
+        $seperator = Settings::seperators('folder');
+
+        return Text::prepend(implode($seperator, Arry::get($extra, 'subs') ?? []), $seperator)
+            . ($name ?: $this->file) . Text::append($this->task == 'taskless' ? '' : $this->task, ':');
     }
 
     private function package(bool $isAlone): void
@@ -151,13 +154,13 @@ class FileTestService extends TestCase
     protected function setType(string $testType, string $variation, string $path, string $file = ''): array
     {
         return [
-            'name' => $n = $this->setTypeName(Text::serialize($path)),
+            'name' => $n = $this->setTypeName(Text::serialize($path), $testType),
             'variation' => $this->setVariation($testType, $variation, $file, $n),
             'test_variation' => $variation
         ];
     }
 
-    private function setTypeName(array $path)
+    private function setTypeName(array $path, string $testType)
     {
         foreach ($path as $folder) {
             $container = lcfirst(Str::singular($folder));
@@ -166,6 +169,8 @@ class FileTestService extends TestCase
             $container = Arry::find(Settings::folders(), $folder, nullable: false)['key'];
             if ($container) return ucfirst($container);
         }
+
+        return ucfirst($testType);
     }
 
     private function setVariation(string $testType, string $variation, string $file, string $type): string
