@@ -66,6 +66,15 @@ return [
         'pairs' => [],
         'require' => ['model', 'user', ''],
     ],
+    'class' => [
+        'name_schema' => '{{ name }}',
+        'name_count' => 'X',
+        'family' => 'src',
+        'path_schema' => '{{ subs }}',
+        'tasks' => [''],
+        'variations' => [''],
+        'pairs' => [],
+    ],
     'command' => [
         'name_schema' => '{{ name }}{{ suffix }}',
         'name_count' => 'X',

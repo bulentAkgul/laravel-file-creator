@@ -68,6 +68,15 @@ class FilePathService
         return [Path::glue(array_filter([self::$family, self::http('channel'), Settings::folders('channel'), "{$name}Channel.php"]))];
     }
 
+    public static function class($name, $extra)
+    {
+        return [Path::glue(array_filter([
+            self::$family,
+            ...array_map(fn($x) => ConvertCase::pascal($x), $extra['subs']),
+            "{$name}.php"
+        ]))];
+    }
+
     public static function command($name)
     {
         return [Path::glue(array_filter([self::$family, self::http('command'), 'Commands', "{$name}Command.php"]))];
