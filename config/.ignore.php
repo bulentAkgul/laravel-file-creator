@@ -1,3 +1,3 @@
 <?php
 
-return ['.ignore'];
+return ['.ignore', 'needs'];
