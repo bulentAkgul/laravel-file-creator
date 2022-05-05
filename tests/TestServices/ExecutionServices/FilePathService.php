@@ -238,7 +238,7 @@ class FilePathService
     {
         $typeTasks = Settings::files('service.tasks');
         $task = explode('.', Arry::get($extra, 'task') ?? '');
-        $tasks = Settings::main("tasks." . (Arry::get($extra, 'api') ? 'api' : 'all'));
+        $tasks = Settings::tasks(Arry::get($extra, 'api') ? 'api' : 'all');
 
         return array_map(
             fn ($x) => Path::glue(array_filter([

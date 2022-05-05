@@ -71,7 +71,7 @@ class CommandsAssertionService
     {
         $task = Text::seperate($name)[0];
 
-        return in_array(strtolower($task), Settings::main('tasks.all')) ? $task : '';
+        return in_array(strtolower($task), Settings::tasks('all')) ? $task : '';
     }
 
     protected function assert(array $expectations, array $map, string $path): array

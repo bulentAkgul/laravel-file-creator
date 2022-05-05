@@ -33,7 +33,7 @@ class AssertionService
 
     private function setType(string $type): string
     {
-        return in_array($type, Settings::main('non_class_types')) ? $type : 'class';
+        return in_array($type, Settings::needs('converted')) ? $type : 'class';
     }
 
     public function class(array $expectation, string $key, string $type): bool|string

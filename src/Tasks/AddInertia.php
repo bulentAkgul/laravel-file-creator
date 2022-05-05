@@ -84,7 +84,7 @@ class AddInertia
     {
         return implode('', array_map(
             fn ($x) => ConvertCase::_($x, Settings::resources("{$app}.convention") ?? 'pascal'),
-            Settings::resourceOptions('tasks_as_sections')
+            Settings::main('tasks_as_sections')
                 ? [$name, self::$method]
                 : [self::$method, $name]
         ));

@@ -33,7 +33,7 @@ class PurifyController
 
     private static function setTasks(array $attr): array
     {
-        return array_diff(Settings::main('tasks.all'), self::getTasks($attr));
+        return array_diff(Settings::tasks('all'), self::getTasks($attr));
     }
 
     private static function getTasks(array $attr): array
@@ -47,7 +47,7 @@ class PurifyController
         ))[0]);
 
         return  !array_filter($tasks)
-            ? Settings::main('tasks.' . (str_contains($attr['variation'], 'api') ? 'api' : 'all'))
+            ? Settings::tasks(str_contains($attr['variation'], 'api') ? 'api' : 'all')
             : $tasks;
     }
 
