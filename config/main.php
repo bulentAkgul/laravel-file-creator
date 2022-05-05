@@ -12,5 +12,5 @@ return [
     ],
     'each_controller_has_route' => true,
     'non_class_types' => ['trait', 'interface', 'enum'],
-    'expand_http_in_packages' => true
+    'expand_http_in_packages' => true,
 ];

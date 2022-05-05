@@ -6,5 +6,5 @@ return [
     'enum' => 'Constants',
     'interface' => 'Contracts',
     'trait' => 'Concerns',
-    'livewire' => 'Livewire'
+    'livewire' => 'Livewire',
 ];
