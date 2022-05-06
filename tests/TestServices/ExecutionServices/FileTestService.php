@@ -132,7 +132,7 @@ class FileTestService extends TestCase
     private function isRequiredPathPart(string $part): bool
     {
         return !in_array($part, [
-            Settings::main('packages_root') ?? 'packages',
+            Settings::folders('packages') ?? 'packages',
             $this->testPackage['folder'],
             $this->testPackage['name']
         ]);
