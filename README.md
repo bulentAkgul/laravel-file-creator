@@ -1,6 +1,6 @@
 # Laravel File Creator
 
-The purpose of this package is to create app, database, and test files. This can be a replacement of Laravel's file generator commands because this package offers quite nice features.
+The purpose of this package is to create app, database, and test files. It can be a replacement of Laravel's file generator commands because this package offers some quite nice features.
 
 ### Installation
 If you installed **[Packagified Laravel](https://github.com/bulentAkgul/packagified-laravel)**, you should have this package already. So skip installation.
@@ -20,21 +20,11 @@ sail artisan packagify:publish-stub
 ```
 create:file {name} {type} {package?} {app?} {--p|parent=} {--t|taskless} {--f|force}
 ```
-### Expected Inputs
-+ **Package**: It won't be used when you work on a Standalone Laravel or Standalone Package. If you don't specify a valid package name, the file will be generated in the App namespace.
 
-+ **App**: Some files like controller, may have app specific. When I say app, I mean admin app, web app, desktop app etc. To create those files in the dedicated app folder, you need to specified the app name. The settings are in **apps** array on **packagify.php** file.
-
-+ **Parent**: To create a nested controller, a parent model, or to create a listener, a parent event is required. Evaluator will warn you when a parent has to be specified.
-
-+ **Taskless**: The file types that have tasks like service, or test, will be generated as a seperate file for each task unless tasks are specified. But sometime, you may want to create a single file without any task. To do that, you need to append "**-t**" or "**--taskless**" to your command. This will cancel the default behaviour of the task explosion.
-
-+ **Force**: Normally, a file will not be regenerated if it exists. If this options is passed, a new file will be created anyway.
-
-### Arguments' Schemas and Details
+### Arguments and Options
 + **Name**: subs/name:task
 
-  + **subs**: You can specify subfolders like **sub1/sub2/sub3** when you need deeper file structure.
+  + **subs**: You can specify subfolders like **sub1/sub2/sub3** when you need deeper file structure than the file types path_schema provides.
 
   + **name**: The file name without any suffix.
 
@@ -49,6 +39,16 @@ create:file {name} {type} {package?} {app?} {--p|parent=} {--t|taskless} {--f|fo
   + **variation**: It's optional.
     + *exist*: If the given file type has variations, you may specify which one should be created.
     + *missing*: The default variation, which is the first item in the variations array will be used.
+
++ **Package**: It won't be used when you work on a Standalone Laravel or Standalone Package. If you don't specify a valid package name, the file will be generated in the App namespace.
+
++ **App**: Some files like controller, may have app specific. When I say app, I mean admin app, web app, desktop app etc. To create those files in the dedicated app folder, you need to specified the app name. The settings are in **apps** array on **packagify.php** file.
+
++ **Parent**: To create a nested controller, a parent model, or to create a listener, a parent event is required. Evaluator will warn you when a parent has to be specified.
+
++ **Taskless**: The file types that have tasks like service, or test, will be generated as a seperate file for each task unless tasks are specified. But sometime, you may want to create a single file without any task. To do that, you need to append "**-t**" or "**--taskless**" to your command. This will cancel the default behaviour of the task explosion.
+
++ **Force**: Normally, a file will not be regenerated if it exists. If this options is passed, a new file will be created anyway.
 
 ## Packagified Laravel
 
