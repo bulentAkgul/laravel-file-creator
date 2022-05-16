@@ -4,7 +4,7 @@ namespace Bakgul\FileCreator\Services\FileServices\SrcFilesServices;
 
 use Bakgul\FileCreator\Services\FileServices\SrcFilesService;
 use Bakgul\FileCreator\Services\RegistrationServices\EventFilesRegistrationService;
-use Bakgul\Kernel\Functions\CreateFile;
+use Bakgul\FileContent\Functions\CreateFile;
 
 class EventFileService extends SrcFilesService
 {

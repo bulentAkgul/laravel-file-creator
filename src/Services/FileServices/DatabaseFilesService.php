@@ -5,7 +5,7 @@ namespace Bakgul\FileCreator\Services\FileServices;
 use Bakgul\FileCreator\Services\FileService;
 use Bakgul\FileCreator\Services\RequestServices\DatabaseRequestService;
 use Bakgul\Kernel\Functions\CallClass;
-use Bakgul\Kernel\Functions\CreateFile;
+use Bakgul\FileContent\Functions\CreateFile;
 
 class DatabaseFilesService extends FileService
 {

@@ -4,7 +4,7 @@ namespace Bakgul\FileCreator\Services\FileServices\SrcFilesServices;
 
 use Bakgul\FileCreator\Services\FileServices\SrcFilesService;
 use Bakgul\FileCreator\Services\RegistrationServices\ProviderFilesRegistrationService;
-use Bakgul\Kernel\Functions\CreateFile;
+use Bakgul\FileContent\Functions\CreateFile;
 
 class ProviderFileService extends SrcFilesService
 {

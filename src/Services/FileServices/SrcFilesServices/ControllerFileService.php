@@ -7,7 +7,7 @@ use Bakgul\FileCreator\Services\RegistrationServices\ControllerFilesRegistration
 use Bakgul\FileCreator\Services\RequestServices\FileRequestServices\ControllerRequestService;
 use Bakgul\FileCreator\Tasks\AddInertia;
 use Bakgul\FileCreator\Tasks\PurifyController;
-use Bakgul\Kernel\Functions\CreateFile;
+use Bakgul\FileContent\Functions\CreateFile;
 
 class ControllerFileService extends SrcFilesService
 {
