@@ -1,6 +1,6 @@
 # Laravel File Creator
 
-This package aims to create the app, database, and test files. It can be a replacement for Laravel's file generator because this package offers some quite nice features. It offers more file types like interface, trait, service, etc. Depending on the settings, it can create dozens of files with a single command and connect them to each other properly.
+This package aims to create the app, database, and test files. It can be a replacement for Laravel's file generator because this package offers some quite nice features. It offers extra file types like interface, trait, service, etc. Depending on the settings, it can create dozens of files with a single command and connect them to each other properly.
 
 #### DISCLAIMER
 It should be production-ready but hasn't been tested enough. You should use it carefully since this package will manipulate your files and folders. Always use a version-control, and make sure you have [**File History**](https://github.com/bulentAkgul/file-history) to be able to roll back the changes.

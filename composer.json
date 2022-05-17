@@ -1,6 +1,6 @@
 {
   "name": "bakgul/laravel-file-creator",
-  "description": "Create PHP files in packages or Laravel repository",
+  "description": "This package aims to create the app, database, and test files. It can be a replacement for Laravel's file generator because this package offers some quite nice features. It offers extra file types like interface, trait, service, etc. Depending on the settings, it can create dozens of files with a single command and connect them to each other properly.",
   "authors": [
     {
       "name": "Bulent Akgul",
