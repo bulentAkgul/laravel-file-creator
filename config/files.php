@@ -6,43 +6,44 @@ return [
     | PHP Files from File Creator
     |--------------------------------------------------------------------------
     |
-    | These are the file types that can be created by "create:file" command.
-    | The keys are the types, and the {{ container }} of the path schemas.
-    |
+    | These are the file types created by the "create:file" command.
+    | 
+    | The keys serve as types, the {{ container }} of the path schemas,
+    | and {{ suffix }} of the name schemas.
+    | 
     | The schemas are the collections of the placeholders for generating
     | names, paths, and namespaces.
     | 
     | The name count can have one of 3 values:
-    |   'S' : the name will be modified to be singular.
-    |   'P' : the name will be modified to be plural.
-    |   'X' : the name won't be modified, and will be used as it's specified.
-    |
-    | Variations: The veraitiees of file types. This will be used for setting
-    |             accurate stub files. If you need adding a new variation,
-    |             create a related stub file. Otherwise the default stub of
-    |             that type will be used.
-    |
-    | Tasks: It is the list of supported tasks by the underlying file type.
-    |        You can customize the task lists. If you add any custom task,
-    |        make sure it's listed in the main "tasks" array.
+    |   'S': the name will be modified to be singular.
+    |   'P': the name will be modified to be plural.
+    |   'X': the name won't be modified and will be used as specified.
     | 
-    | Pairs: It is the list of the file types that will also be created
-    |        when any file is created. This works recursively. For example,
-    |        one of the pairs of controller is model, whose pair is migration,
-    |        whose pair is factory. So along with the other pairs, a model,
-    |        migration, factory will be generated when you create a controller.
-    |        If a pair has tasks like "service," which is controller's pair,
-    |        a seperate file will be created for each task. To prevent this
-    |        you can add "-t" (taskless) to the command.
+    | Variations: The varieties of file types. This will be used for setting
+    | accurate stub files. If you need a new variation, create a related
+    | stub file. Otherwise, the default stub of that type will be used.
+    | 
+    | Tasks: The list of supported tasks by the underlying file type.
+    | You can customize the task lists. If you add any custom task,
+    | ensure it's listed in the main "tasks" array.
+    | 
+    | Pairs: If the creating file has any pairs, they will also be created
+    | along with the main file. This works recursively. For example, the
+    | controller's pair is the model, the model's pair is the migration,
+    | and the migration's pair is the factory. So along with the controller
+    | and its other pairs, a model, migration, and factory will be generated
+    | when you create a controller. If a pair has tasks, a seperate file will
+    | be created for each task. You can add "-t" (taskless) to the command
+    | to prevent this.
     | 
     | Require: If a file needs another one to perform fully, it should be
-    |          specified here. This is an array of specifications of a single
-    |          file like ["type", "name", "variation"]. For example, policy
-    |          requires a user model, event requires EvenServiceProvider.
-    |
-    | * Use "create:resource" command to create "component" or "livewire"
-    |   because these two types will need some extra inputs that can't be
-    |   passed through "create:file" command.
+    | specified here. This is an array of specifications of a single file
+    | like ["type", "name", "variation"]. For example, the policy requires
+    | a user model, and the event requires EvenServiceProvider.
+    | 
+    | * Use the "create:resource" command to create "component" or 
+    |   "livewire" because these two types will need some extra inputs
+    |   that can't be passed through the "create:file" command.
     |
     */
     'migration' => [

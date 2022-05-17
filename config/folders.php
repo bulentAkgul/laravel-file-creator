@@ -6,9 +6,10 @@ return [
     | PHP Files' Folders
     |--------------------------------------------------------------------------
     |
-    | The folder name will be listed here, if the file type can't be converted
-    | to produce folder name. For example, by Laravel defaults, channels are
-    | created under Broadcasting folder. Feel free to change, add or remove.
+    | If the file type is not directly converted to the folder name,
+    | it will be listed in this array. For example, by Laravel defaults,
+    | channels are created under the Broadcasting folder. Feel free to
+    | change, add or remove.
     |
     */
     'api' => 'API',

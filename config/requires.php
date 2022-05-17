@@ -6,9 +6,10 @@ return [
     | Required Files Specs
     |--------------------------------------------------------------------------
     |
-    | Some file types on "files" array has a specification called "require."
-    | Those required files details should be specified here. When 'class' is
-    | empty, that file will be generated in the same namespace as the main file.
+    | Some file types on the "files" array have a specification called
+    | "require." That required file details should be specified here.
+    | When "class" is empty, that file will be generated in the same
+    | root namespace as the main file.
     |
     */
     [
