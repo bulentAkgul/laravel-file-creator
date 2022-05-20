@@ -3,7 +3,7 @@
 namespace {{ namespace }};
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use {{ root_namespace }}\Models\{{ name }};
+use {{ model_namespace }}\{{ name }};
 
 class {{ class }} extends Factory
 {
