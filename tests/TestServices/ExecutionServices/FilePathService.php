@@ -9,7 +9,6 @@ use Bakgul\Kernel\Helpers\Text;
 use Bakgul\Kernel\Tasks\ConvertCase;
 use Bakgul\Kernel\Helpers\Convention;
 use Bakgul\Kernel\Helpers\Path;
-use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
@@ -144,13 +143,11 @@ class FilePathService
 
     public static function migration($name, $extra = [], $policy = false)
     {
-        $d = Carbon::today()->format('Y_m_d');
-
         return self::isExtra($extra, 'parent') ? [
-            Path::glue(['database', 'migrations', "{$d}_000000_create_" . ConvertCase::snake(Str::plural(self::$extraName)) . "_table.php"])
+            Path::glue(['database', 'migrations', "000000_create_" . ConvertCase::snake(Str::plural(self::$extraName)) . "_table.php"])
         ] : [
-            Path::glue(['database', 'migrations', "{$d}_000000_create_" . ConvertCase::snake(Str::plural($name)) . "_table.php"]),
-            $policy ? Path::glue(['database', 'migrations', "{$d}_000000_create_users_table.php"]) : '',
+            Path::glue(['database', 'migrations', "000000_create_" . ConvertCase::snake(Str::plural($name)) . "_table.php"]),
+            $policy ? Path::glue(['database', 'migrations', "000000_create_users_table.php"]) : '',
         ];
     }
 

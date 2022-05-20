@@ -7,7 +7,6 @@ use Bakgul\FileCreator\Services\RequestService;
 use Bakgul\Kernel\Helpers\Path;
 use Bakgul\Kernel\Helpers\Pluralizer;
 use Bakgul\Kernel\Helpers\Settings;
-use Carbon\Carbon;
 
 class DatabaseRequestService extends RequestService
 {
@@ -23,7 +22,6 @@ class DatabaseRequestService extends RequestService
     {
         return array_merge($map, [
             'table' => Convention::table($attr['name'], Pluralizer::set($attr['name_count'])),
-            'date' => Carbon::today()->format('Y_m_d'),
         ]);
     }
 

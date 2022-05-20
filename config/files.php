@@ -47,7 +47,7 @@ return [
     |
     */
     'migration' => [
-        'name_schema' => '{{ date }}_000000_create_{{ table }}_table',
+        'name_schema' => '000000_create_{{ table }}_table',
         'name_count' => 'P',
         'family' => 'database',
         'convention' => 'snake',
