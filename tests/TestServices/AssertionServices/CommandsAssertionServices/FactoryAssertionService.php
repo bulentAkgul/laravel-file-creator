@@ -12,7 +12,8 @@ class FactoryAssertionService extends CommandsAssertionService
             [
                 2 => $this->setNamespace($rootNamespace, 'database', 'Factories'),
                 7 => 'class {{ name }}Factory extends Factory',
-                9 => 'protected string $model = {{ name }}::class;'
+                9 => 'public function modelName()',
+                11 => 'return {{ name }}::class;'
             ],
             [
                 'name' => $this->setName($path, 'Factory.php')

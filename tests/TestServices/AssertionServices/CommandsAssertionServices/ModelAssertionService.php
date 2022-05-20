@@ -11,7 +11,9 @@ class ModelAssertionService extends CommandsAssertionService
         return $this->assert(
             [
                 2 => $this->setNamespace($rootNamespace, 'src', 'Models'),
-                7 => 'class {{ name }} extends Model'
+                8 => 'class {{ name }} extends Model',
+                12 => 'protected static function newFactory()',
+                14 => 'return {{ name }}Factory::new();'
             ],
             [
                 'name' => $this->setName($path, '.php')

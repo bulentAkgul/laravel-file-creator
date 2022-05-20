@@ -74,6 +74,7 @@ class SrcRequestService extends RequestService
         $request['map']['user_model'] = $this->makeUserClass($request);
         $request['map']['class'] = $this->makeReplacements($request, 'name_schema');
         $request['map']['namespace'] = $this->setNamespace($request);
+        $request['map']['db_namespace'] = $this->setDbNamespace($request);
 
         $request['attr']['path'] = $this->makeReplacements($request, 'path');
         $request['attr']['file'] = "{$request['map']['class']}.php";
@@ -90,6 +91,11 @@ class SrcRequestService extends RequestService
         return $request['map']['name'] != 'User' && $model
             ? "use {$model['class']};" . PHP_EOL
             : '';
+    }
+
+    private function setDbNamespace($request): string
+    {
+        return "{$request['map']['root_namespace']}\Database";
     }
 
     private function modifyPointers(array $request)
