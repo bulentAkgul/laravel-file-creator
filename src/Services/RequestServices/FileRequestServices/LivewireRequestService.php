@@ -2,14 +2,13 @@
 
 namespace Bakgul\FileCreator\Services\RequestServices\FileRequestServices;
 
+use Bakgul\FileCreator\Functions\SetViewPath;
 use Bakgul\Kernel\Helpers\Text;
 use Bakgul\FileCreator\Services\RequestServices\SrcRequestService;
 use Bakgul\Kernel\Helpers\Arry;
 use Bakgul\Kernel\Helpers\Convention;
-use Bakgul\Kernel\Helpers\Path;
 use Bakgul\Kernel\Helpers\Settings;
 use Bakgul\Kernel\Tasks\ConvertCase;
-use Illuminate\Support\Str;
 
 class LivewireRequestService extends SrcRequestService
 {
@@ -40,17 +39,8 @@ class LivewireRequestService extends SrcRequestService
 
     private function setView(array $request): string
     {
-        $variation = Arry::get($request['attr']['subs'], 0);
-        $convention = Settings::resources('blade.convention');
-
-        if ($this->isModifyable($variation)) {
-            $request['attr']['subs'][0] = Str::plural($request['attr']['subs'][0]);
-        }
-
-        return Path::glue(array_map(
-            fn ($x) => ConvertCase::{$convention}($x),
-            [...$request['attr']['subs'], ConvertCase::{$convention}(Text::append($request['attr']['name']))]
-        ), '.');
+        return SetViewPath::_($request)
+            . ConvertCase::_($request['attr']['name'], Settings::resources('blade.convention') ?? 'kebab');
     }
 
     private function isModifyable($variation): bool

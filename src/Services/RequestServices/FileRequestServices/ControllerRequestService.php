@@ -83,7 +83,7 @@ class ControllerRequestService extends SrcRequestService
 
     private function generateNamespace($type)
     {
-        return 'use ' . str_replace('\\\\', '\\', Text::replaceByMap(
+        return 'use ' . str_replace(['\\\\', '/'], '\\', Text::replaceByMap(
             $this->modifyMap($type), $this->schema($type['type'])
         )) . ';';
     }
