@@ -7,7 +7,7 @@ use Illuminate\Queue\InteractsWithQueue;
 
 class {{ class }}
 {
-    public function __construct(): void
+    public function __construct()
     {
         //
     }

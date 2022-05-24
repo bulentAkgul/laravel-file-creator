@@ -5,7 +5,7 @@ namespace {{ namespace }};
 {{ user_model }}
 class {{ class }}
 {
-    public function __construct(): void
+    public function __construct()
     {
         //
     }

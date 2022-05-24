@@ -6,7 +6,7 @@ use Illuminate\Contracts\Validation\Rule;
 
 class {{ class }} implements Rule
 {
-    public function __construct(): void
+    public function __construct()
     {
         //
     }
