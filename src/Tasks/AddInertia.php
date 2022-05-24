@@ -28,7 +28,7 @@ class AddInertia
             $content[$i] = self::modifyLine($line, $request);
         }
 
-        WriteToFile::handle($content, $file);
+        WriteToFile::_($content, $file);
     }
 
     private static function isNotRenderable($i, $content)

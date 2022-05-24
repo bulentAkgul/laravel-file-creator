@@ -35,7 +35,7 @@ class AddViewReturn
             self::$content[$i] = self::modifyLine($line, $request);
         }
 
-        WriteToFile::handle(self::$content, $file);
+        WriteToFile::_(self::$content, $file);
     }
 
     private static function hasNoView($request)
