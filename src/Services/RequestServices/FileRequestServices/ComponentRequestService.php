@@ -3,6 +3,7 @@
 namespace Bakgul\FileCreator\Services\RequestServices\FileRequestServices;
 
 use Bakgul\FileCreator\Services\RequestServices\SrcRequestService;
+use Bakgul\Kernel\Functions\DropTask;
 use Bakgul\Kernel\Helpers\Settings;
 use Bakgul\Kernel\Helpers\Text;
 use Bakgul\Kernel\Tasks\ConvertCase;
@@ -11,9 +12,9 @@ class ComponentRequestService extends SrcRequestService
 {
     public function __invoke(array $request): array
     {
-        $request['attr']['path'] = $this->changeTail($request, 'path');
+        $request['attr']['path'] = $this->changeFolder($this->changeTail($request, 'path'));
 
-        $request['map']['namespace'] = $this->changeTail($request, 'namespace');
+        $request['map']['namespace'] = $this->changeFolder($this->changeTail($request, 'namespace'));
         $request['map']['subs'] = $this->changeTail($request, 'subs');
         $request['map']['path'] = $this->setPath($request['map']);
         $request['map']['class'] = $this->setClass($request, 'pascal');
@@ -33,13 +34,20 @@ class ComponentRequestService extends SrcRequestService
             : $src[$key];
     }
 
+    private function changeFolder(string $value): string
+    {
+        return str_replace('Views', 'View', $value);
+    }
+
     private function setPath(array $map): string
     {
         if ($map['subs'] == 'Layouts') return '';
 
+        $parent = DropTask::_($map['name']);
+
         return implode('.', array_filter(array_map(
             fn ($x) => ConvertCase::_($x, Settings::resources('blade.convention') ?? 'kebab'),
-            explode('.', str_replace(DIRECTORY_SEPARATOR, '.', "{$map['subs']}.{$map['name']}"))
+            explode('.', str_replace(DIRECTORY_SEPARATOR, '.', "{$map['subs']}.{$parent}"))
         )));
     }
 
