@@ -4,12 +4,12 @@ namespace Bakgul\FileCreator\Functions;
 
 use Bakgul\Kernel\Helpers\Settings;
 use Bakgul\Kernel\Helpers\Text;
-use Bakgul\Kernel\Tasks\ConvertCase;
 
 class SetViewPath
 {
     public static function _($request)
     {
+        ray($request);
         $registrar = match (true) {
             Settings::standalone('laravel') => '',
             Settings::standalone('package') => Settings::identity('registrar'),

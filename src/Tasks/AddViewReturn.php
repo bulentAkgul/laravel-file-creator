@@ -19,6 +19,8 @@ class AddViewReturn
 
     public static function _(array $request): void
     {
+        if (Arry::hasNot('views', $request['attr'])) return;
+        
         $file = Path::glue([$request['attr']['path'], $request['attr']['file']]);
 
         if (self::hasNoView($request) || self::hasViewAdded($file)) return;
