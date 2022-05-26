@@ -28,7 +28,7 @@ class ControllerFilesRegistrationService extends RegistrationService
         return [
             'start' => ["Route::{$this->routeMethod()}([", 0],
             'end' => ['])', 0],
-            'repeat' => str_contains($this->routeMethod(), 'api') ? 1 : 0,
+            'repeat' => str_contains($this->routeMethod(), 'api') ? 2 : 0,
             'isSortable' => true,
             'bracket' => '[]'
         ];
