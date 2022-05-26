@@ -20,7 +20,7 @@ class {{ class }} extends Controller
 
     public function store(Store{{ request }}Request $request, {{ parent }} ${{ parent_var }}, Store{{ service }}Service $service)
     {
-        return $service->handle($request, ${{ parent_var }}, new {{ name }});
+        return $service->handle($request->validated(), ${{ parent_var }}, new {{ name }});
     }
 
     public function show({{ parent }} ${{ parent_var }}, {{ name }} ${{ var }}, Show{{ service }}Service $service)
@@ -35,7 +35,7 @@ class {{ class }} extends Controller
 
     public function update(Update{{ request }}Request $request, {{ parent }} ${{ parent_var }}, {{ name }} ${{ var }}, Update{{ service }}Service $service)
     {
-        return $service->handle($request, ${{ parent_var }}, ${{ var }});
+        return $service->handle($request->validated(), ${{ parent_var }}, ${{ var }});
     }
 
     public function destroy({{ parent }} ${{ parent_var }}, {{ name }} ${{ var }}, Destroy{{ service }}Service $service)
