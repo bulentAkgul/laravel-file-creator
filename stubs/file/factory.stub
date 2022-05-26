@@ -7,10 +7,7 @@ use {{ model_namespace }}\{{ name }};
 
 class {{ class }} extends Factory
 {
-    public function modelName()
-    {
-        return {{ name }}::class;
-    }
+    protected $model = {{ name }}::class;
 
     public function definition(): array
     {
