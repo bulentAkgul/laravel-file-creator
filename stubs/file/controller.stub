@@ -9,17 +9,17 @@ class {{ class }} extends Controller
 {
     public function index(Index{{ service }}Service $service)
     {
-        return $service->handle(new {{ name }});
+        return $service->handle({{ name }}::class);
     }
 
     public function create(Create{{ service }}Service $service)
     {
-        return $service->handle(new {{ name }});
+        return $service->handle({{ name }}::class);
     }
 
     public function store(Store{{ request }}Request $request, Store{{ service }}Service $service)
     {
-        return $service->handle($request->validated(), new {{ name }});
+        return $service->handle($request->validated(), {{ name }}::class);
     }
 
     public function show({{ name }} ${{ var }}, Show{{ service }}Service $service)
