@@ -9,7 +9,6 @@ class SetViewPath
 {
     public static function _($request)
     {
-        ray($request);
         $registrar = match (true) {
             Settings::standalone('laravel') => '',
             Settings::standalone('package') => Settings::identity('registrar'),
