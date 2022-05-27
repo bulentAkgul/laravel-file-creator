@@ -12,36 +12,36 @@ class {{ class }}
 
     public function viewAny(User $user): Response|bool
     {
-        return false;
+        return true;
     }
 
     public function view(User $user, {{ name }} ${{ var }}): Response|bool
     {
-        return false;
+        return true;
     }
 
     public function create(User $user): Response|bool
     {
-        return false;
+        return true;
     }
 
     public function update(User $user, {{ name }} ${{ var }}): Response|bool
     {
-        return false;
+        return true;
     }
 
     public function delete(User $user, {{ name }} ${{ var }}): Response|bool
     {
-        return false;
+        return true;
     }
 
     public function restore(User $user, {{ name }} ${{ var }}): Response|bool
     {
-        return false;
+        return true;
     }
 
     public function forceDelete(User $user, {{ name }} ${{ var }}): Response|bool
     {
-        return false;
+        return true;
     }
 }
