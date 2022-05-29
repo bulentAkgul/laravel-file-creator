@@ -59,6 +59,7 @@ class PurifyController
             'isStrict' => true,
             'part' => '',
             'repeat' => 0,
+            'jump' => '',
         ];
     }
 
