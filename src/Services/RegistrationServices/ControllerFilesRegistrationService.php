@@ -26,12 +26,18 @@ class ControllerFilesRegistrationService extends RegistrationService
     private function blockSpecs(): array
     {
         return [
-            'start' => ["Route::{$this->routeMethod()}([", 0],
+            'start' => ["Route::prefix('api/{$this->appFolder()}')", 0],
             'end' => ['])', 0],
             'repeat' => str_contains($this->routeMethod(), 'api') ? 2 : 0,
             'isSortable' => true,
-            'bracket' => '[]'
+            'bracket' => '[]',
+            'jump' => "Route::{$this->routeMethod()}(["
         ];
+    }
+
+    private function appFolder()
+    {
+        return $this->request['attr']['app_folder'];
     }
 
     private function routeMethod()
