@@ -90,7 +90,7 @@ return [
         'path_schema' => '{{ container }}{{ subs }}',
         'tasks' => [''],
         'variations' => ['', 'static'],
-        'pairs' => [],
+        'pairs' => ['test'],
     ],
     'cast' => [
         'name_schema' => '{{ name }}{{ suffix }}',
@@ -145,7 +145,7 @@ return [
         'path_schema' => '{{ wrapper }}{{ container }}{{ app }}{{ api }}{{ subs }}',
         'tasks' => [''],
         'variations' => ['', 'api', 'invokable', 'model-api', 'model', 'nested-api', 'nested', 'plain'],
-        'pairs' => ['model', 'request', 'resource', 'service'],
+        'pairs' => ['model', 'request', 'resource', 'service', 'test'],
     ],
     'enum' => [
         'name_schema' => '{{ name }}',
