@@ -39,7 +39,7 @@ class TestRequestService extends RequestService
     {
         return match (true) {
             $this->hasTask($attr) => Folder::name($attr['name'], $attr['type']),
-            $this->isIsolated($attr) => 'IsolatedTests',
+            $this->isIsolated($attr) => Settings::folders('class-tests'),
             default => ''
         };
     }

@@ -18,4 +18,5 @@ return [
     'interface' => 'Contracts',
     'trait' => 'Concerns',
     'livewire' => 'Livewire',
+    'class-tests' => 'IsolatedTests'
 ];
