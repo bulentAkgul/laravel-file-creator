@@ -4,6 +4,8 @@ namespace Bakgul\FileCreator\Tests\TestServices\AssertionServices\CommandsAssert
 
 use Bakgul\Kernel\Helpers\Settings;
 use Bakgul\FileCreator\Tests\TestServices\AssertionServices\CommandsAssertionService;
+use Bakgul\Kernel\Helpers\Path;
+use Bakgul\Kernel\Helpers\Text;
 
 class TestAssertionService extends CommandsAssertionService
 {
@@ -11,7 +13,7 @@ class TestAssertionService extends CommandsAssertionService
     {
         return $this->{Settings::default('files', 'test.variations')}($path, $rootNamespace);
     }
-    
+
     public function feature(string $path, string $rootNamespace): array
     {
         $name = $this->setName($path, 'Test.php');
@@ -19,7 +21,7 @@ class TestAssertionService extends CommandsAssertionService
 
         return $this->assert(
             [
-                2 => $this->setNamespace($rootNamespace, 'tests', 'Feature' . ($task ? '\{{ name }}Tests' : '')),
+                2 => $this->namespace($rootNamespace, $path),
                 6 => $this->setNamespace($rootNamespace, 'tests', 'TestCase', 'use') . ';',
                 8 => 'class {{ task }}{{ name }}Test extends TestCase'
             ],
@@ -44,5 +46,14 @@ class TestAssertionService extends CommandsAssertionService
             ],
             $path
         );
+    }
+
+    private function namespace($rn, $path)
+    {
+        $body = Text::dropTail(explode('tests' . DIRECTORY_SEPARATOR, $path)[1]);
+
+        return 'namespace ' . Path::glue(array_filter(
+            [$rn, 'Tests', Path::toNamespace($body)]
+        ), '\\') . ';';
     }
 }

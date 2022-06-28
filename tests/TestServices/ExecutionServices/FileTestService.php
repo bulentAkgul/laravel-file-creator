@@ -5,11 +5,12 @@ namespace Bakgul\FileCreator\Tests\TestServices\ExecutionServices;
 use Bakgul\Kernel\Helpers\Path;
 use Bakgul\Kernel\Helpers\Settings;
 use Bakgul\Kernel\Helpers\Text;
-use Bakgul\Kernel\Tasks\CollectTypes;
 use Bakgul\Kernel\Tests\Tasks\SetupTest;
 use Bakgul\FileCreator\Tests\TestServices\AssertionServices\CommandsAssertionService;
+use Bakgul\FileCreator\Tests\TestTasks\ConvertCommandToRequest;
 use Bakgul\Kernel\Helpers\Arry;
 use Bakgul\Kernel\Tasks\ConvertCase;
+use Bakgul\Kernel\Tasks\MakeFileList;
 use Bakgul\Kernel\Tests\Services\TestDataService;
 use Bakgul\Kernel\Tests\TestCase;
 use Illuminate\Support\Str;
@@ -37,9 +38,11 @@ class FileTestService extends TestCase
 
         $command = $this->command($testType, $variation, $name, $extra);
 
+        $extra['files'] = MakeFileList::_(ConvertCommandToRequest::_($command));
+
         $this->runCommand($command);
 
-        $this->execute($variation, $testType, $name, $extra);
+        $this->execute($variation, $testType, $extra);
     }
 
     private function command(string $type, string $variation, string $name, array $extra)
@@ -90,15 +93,15 @@ class FileTestService extends TestCase
         $this->artisan($command);
     }
 
-    private function execute($variation, $testType, $name, $extra)
+    private function execute($variation, $testType, $extra)
     {
         $asserter = new CommandsAssertionService;
 
-        $extra['paths'] = $this->setPaths($testType, $name, $variation, $extra);
+        $extra['paths'] = $this->setPaths($extra);
 
         foreach ($extra['paths'] as $path) {
             $extra['type'] = $this->setType($testType, $variation, $path);
-            
+
             $fullPath = Path::glue([$this->basePath(), $path]);
 
             $this->assertFileExists($fullPath);
@@ -111,9 +114,9 @@ class FileTestService extends TestCase
         }
     }
 
-    private function setPaths(string $type, string $name, string $variation, array $extra): array
+    private function setPaths(array $extra): array
     {
-        return FilePathService::compose($this->package, CollectTypes::_($type), $variation, $name ?: $this->file, $extra);
+        return FilePathService::compose($this->package, $extra);
     }
 
     private function basePath()

@@ -5,288 +5,252 @@ namespace Bakgul\FileCreator\Tests\TestServices\ExecutionServices;
 use Bakgul\Kernel\Helpers\Arry;
 use Bakgul\Kernel\Helpers\Pluralizer;
 use Bakgul\Kernel\Helpers\Settings;
-use Bakgul\Kernel\Helpers\Text;
 use Bakgul\Kernel\Tasks\ConvertCase;
 use Bakgul\Kernel\Helpers\Convention;
 use Bakgul\Kernel\Helpers\Path;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 class FilePathService
 {
-    private static $name = 'post';
-    private static $extraName = 'Article';
+    private static $name;
+    private static $extraName;
+    private static $paths;
+    private static $extra;
     private static $family;
-    private static $variation;
-    private static $types;
+    private static $mains;
 
-    public static function compose(string $package, array $types, string $variation, string $name, array $extra)
+    public static function compose(string $package, array $extra)
     {
-        self::$variation = $variation;
-        self::$types = $types;
+        self::reset();
 
-        self::setFamily($package);
+        self::setVariables($package, $extra);
 
-        return array_filter(Arry::unique(Arr::flatten(array_map(
-            fn ($x) => self::callType($x, $name, $extra),
-            array_filter($types, fn ($x) => $x['status'] != 'require')
-        ))));
+        self::generatePaths($extra);
+
+        return self::setPaths();
+    }
+
+    private static function reset()
+    {
+        self::$name = 'post';
+        self::$extraName = 'Article';
+        self::$paths = [];
+    }
+
+    private static function setPaths()
+    {
+        return array_filter(Arry::unique(self::$paths));
+    }
+
+    private static function setVariables($package, $extra)
+    {
+        self::$extra = $extra;
+        self::$family = self::setFamily($package);
+        self::$extraName = self::setExtraName();
+        self::$mains = self::setMainFiles();
+    }
+
+    private static function setMainFiles()
+    {
+        return array_values(array_filter(
+            self::$extra['files'],
+            fn ($x) => $x['status'] == 'main' && $x['order'] == 'main')
+        );
     }
 
     private static function setFamily(string $package)
     {
-        self::$family = match (true) {
-            Settings::standalone('package') => 'src',
-            Settings::standalone('laravel') => 'app',
+        return match (Settings::repo()) {
+            'sp' => 'src',
+            'sl' => 'app',
             default => $package == 'x' ? 'app' : 'src'
         };
     }
 
-    private static function callType($type, $name, $extra)
+    private static function setExtraName()
     {
-        return self::{$type['type']}(self::setName($name, $type['type']), $extra);
+        return Convention::class(explode(' ', Arry::get(explode('-p=', Arry::get(self::$extra, 'append') ?? ''), 1) ?? '')[0]) ?: self::$extraName;
     }
 
-    private static function setName(string $name, string $type)
+    private static function generatePaths(array $extra): void
     {
-        return Convention::class($name ?: self::$name, Pluralizer::set($type));
+        array_map(
+            fn ($file) => self::callType([...$file, ...self::modify($file)]),
+            array_filter($extra['files'], fn ($x) => $x['order'] != 'require')
+        );
     }
 
-    public static function action($name)
-    {
-        return [Path::glue(array_filter([self::$family, self::http('action'), 'Actions', "{$name}.php"]))];
-    }
-
-    public static function cast($name)
-    {
-        return [Path::glue(array_filter([self::$family, self::http('cast'), 'Casts', "{$name}Cast.php"]))];
-    }
-
-    public static function channel($name)
-    {
-        return [Path::glue(array_filter([self::$family, self::http('channel'), Settings::folders('channel'), "{$name}Channel.php"]))];
-    }
-
-    public static function class($name, $extra)
-    {
-        return [Path::glue(array_filter([
-            self::$family,
-            ...array_map(fn($x) => ConvertCase::pascal($x), $extra['subs']),
-            "{$name}.php"
-        ]))];
-    }
-
-    public static function command($name)
-    {
-        return [Path::glue(array_filter([self::$family, self::http('command'), 'Commands', "{$name}Command.php"]))];
-    }
-
-    public static function controller($name, $extra)
+    private static function modify(array $file): array
     {
         return [
-            Path::glue(array_filter([
-                self::$family, self::http('controller'), 'Controllers', 'Admin', $extra['api'] ? Settings::folders('api') : '', "{$name}Controller.php"
-            ])),
-            ...self::parents(['migration', 'policy', 'model', 'factory', 'seeder'], $extra)
+            'name' => self::setName($file),
+            'subs' => self::setSubs($file),
         ];
     }
 
-    public static function enum($name)
+    private static function setName(array $file)
     {
-        return [Path::glue(array_filter([self::$family, self::http('enum'), Settings::folders('enum'), "{$name}.php"]))];
+        return Convention::class($file['name'] ?: self::$name, Pluralizer::set($file['type']));
     }
 
-    public static function exception($name)
+    private static function setSubs($file)
     {
-        return [Path::glue(array_filter([self::$family, self::http('exception'), 'Exceptions', "{$name}Exception.php"]))];
+        return array_map(fn ($x) => ConvertCase::pascal($x), explode(DIRECTORY_SEPARATOR, $file['subs']));
     }
 
-    public static function event($name)
+    private static function callType(array $file): void
     {
-        return [Path::glue(array_filter([self::$family, self::http('event'), 'Events', "{$name}.php"]))];
+        self::$paths = [...self::$paths, self::makePath(self::{$file['type']}($file))];
     }
 
-    public static function factory($name, $extra = [], $policy = false)
+    private static function makePath(array $parts)
     {
-        return self::isExtra($extra, 'parent') ? [
-            Path::glue(['database', 'factories', self::$extraName . 'Factory.php'])
-        ] : [
-            Path::glue(['database', 'factories', "{$name}Factory.php"]),
-            $policy ? Path::glue(['database', 'factories', 'UserFactory.php']) : '',
-        ];
+        return Path::glue(array_filter($parts));
     }
 
-    public static function interface($name)
+    public static function action(array $file)
     {
-        return [Path::glue(array_filter([self::$family, self::http('interface'), Settings::folders('interface'), "{$name}.php"]))];
+        return [self::$family, self::http('action'), 'Actions', "{$file['name']}.php"];
     }
 
-    public static function job($name)
+    public static function cast(array $file)
     {
-        return [Path::glue(array_filter([self::$family, self::http('job'), 'Jobs', "{$name}Job.php"]))];
+        return [self::$family, self::http('cast'), 'Casts', "{$file['name']}Cast.php"];
     }
 
-    public static function listener($name)
+    public static function channel(array $file)
     {
-        return [Path::glue(array_filter([self::$family, self::http('listener'), 'Listeners', "{$name}Listener.php"]))];
+        return [self::$family, self::http('channel'), Settings::folders('channel'), "{$file['name']}Channel.php"];
     }
 
-    public static function mail($name)
+    public static function class(array $file)
     {
-        return [Path::glue(array_filter([self::$family, self::http('mail'), 'Mails', "{$name}Mail.php"]))];
+        return [self::$family, ...$file['subs'], "{$file['name']}.php"];
     }
 
-    public static function middleware($name)
+    public static function command(array $file)
     {
-        return [Path::glue(array_filter([self::$family, self::http('middleware'), 'Middleware', "{$name}.php"]))];
+        return [self::$family, self::http('command'), 'Commands', "{$file['name']}Command.php"];
     }
 
-    public static function migration($name, $extra = [], $policy = false)
+    public static function controller(array $file)
     {
-        return self::isExtra($extra, 'parent') ? [
-            Path::glue(['database', 'migrations', "000000_create_" . ConvertCase::snake(Str::plural(self::$extraName)) . "_table.php"])
-        ] : [
-            Path::glue(['database', 'migrations', "000000_create_" . ConvertCase::snake(Str::plural($name)) . "_table.php"]),
-            $policy ? Path::glue(['database', 'migrations', "000000_create_users_table.php"]) : '',
-        ];
+        return [self::$family, self::http('controller'), 'Controllers', 'Admin', self::$extra['api'] ? Settings::folders('api') : '', "{$file['name']}Controller.php"];
     }
 
-    public static function model($name, $extra = [])
+    public static function enum(array $file)
     {
-        return self::isExtra($extra, 'parent') ? [
-            Path::glue(
-                array_filter([self::$family, self::http('model'), 'Models', self::$extraName . '.php']),
-            )
-        ] : [
-            Path::glue(
-                array_filter([self::$family, self::http('model'), 'Models', "{$name}.php"])
-            )
-        ];
+        return [self::$family, self::http('enum'), Settings::folders('enum'), "{$file['name']}.php"];
     }
 
-    public static function notification($name)
+    public static function exception(array $file)
     {
-        return [Path::glue(array_filter([self::$family, self::http('notification'), 'Notifications', "{$name}Notification.php"]))];
+        return [self::$family, self::http('exception'), 'Exceptions', "{$file['name']}Exception.php"];
     }
 
-    public static function observer($name, $extra = [])
+    public static function event(array $file)
     {
-        return self::isExtra($extra, 'parent') ? [
-            Path::glue(
-                array_filter([self::$family, self::http('observer'), 'Observers', self::$extraName . 'Observer.php'])
-            )
-        ] : [
-            Path::glue(
-                array_filter([self::$family, self::http('observer'), 'Observers', $name . 'Observer.php'])
-            )
-        ];
+        return [self::$family, self::http('event'), 'Events', "{$file['name']}.php"];
     }
 
-    public static function policy($name, $extra = [])
+    public static function factory(array $file)
     {
-        return self::isExtra($extra, 'parent') ? [
-            Path::glue(
-                array_filter([self::$family, self::http('policy'), 'Policies', self::$extraName . 'Policy.php'])
-            )
-        ] : [
-            Path::glue(
-                array_filter([self::$family, self::http('policy'), 'Policies', $name . 'Policy.php'])
-            )
-        ];
+        return ['database', 'factories', "{$file['name']}Factory.php"];
     }
 
-    public static function provider($name)
+    public static function interface(array $file)
     {
-        return [Path::glue(array_filter([self::$family, self::http('provider'), 'Providers', "{$name}ServiceProvider.php"]))];
+        return [self::$family, self::http('interface'), Settings::folders('interface'), "{$file['name']}.php"];
     }
 
-    public static function request($name, $extra)
+    public static function job(array $file)
     {
-        $task = Arry::get($extra, 'task') ?: '';
-        $tasks = Settings::files('request.tasks');
-
-        return array_map(
-            fn ($x) => Path::glue(array_filter([self::$family, self::http('request'), 'Requests', "{$name}Requests", ucfirst($x) . "{$name}Request.php"])),
-            $task ? array_intersect(explode('.', $task), $tasks) : $tasks
-        );
+        return [self::$family, self::http('job'), 'Jobs', "{$file['name']}Job.php"];
     }
 
-    public static function resource($name)
+    public static function listener(array $file)
     {
-        return [Path::glue(array_filter([self::$family, self::http('resource'), 'Resources', "{$name}Resource.php"]))];
+        return [self::$family, self::http('listener'), 'Listeners', "{$file['name']}Listener.php"];
     }
 
-    public static function rule($name)
+    public static function mail(array $file)
     {
-        return [Path::glue(array_filter([self::$family, self::http('rule'), 'Rules', "{$name}Rule.php"]))];
+        return [self::$family, self::http('mail'), 'Mails', "{$file['name']}Mail.php"];
     }
 
-    public static function seeder($name, $extra = [], $policy = false)
+    public static function middleware(array $file)
     {
-        return self::isExtra($extra, 'parent') ? [
-            Path::glue(['database', 'seeders', self::$extraName . 'Seeder.php'])
-        ] : [
-            Path::glue(['database', 'seeders', "{$name}Seeder.php"]),
-            $policy ? Path::glue(['database', 'factories', 'UserSeeder.php']) : '',
-        ];
+        return [self::$family, self::http('middleware'), 'Middleware', "{$file['name']}.php"];
     }
 
-    public static function service($name, $extra)
+    public static function migration(array $file)
     {
-        $typeTasks = Settings::files('service.tasks');
-        $task = explode('.', Arry::get($extra, 'task') ?? '');
-        $tasks = Settings::tasks(Arry::get($extra, 'api') ? 'api' : 'all');
-
-        return array_map(
-            fn ($x) => Path::glue(array_filter([
-                self::$family, self::http('service'), 'Services', $x ? "{$name}Services" : '', "{$x}{$name}Service.php"
-            ])),
-            array_map(
-                fn ($x) => ucfirst($x),
-                $task[0] == 'taskless'
-                    ? (self::$types[0]['type'] == 'controller' ? [] : [''])
-                    : (array_filter($task)
-                        ? array_intersect($task, $tasks, $typeTasks)
-                        : array_intersect($tasks, $typeTasks)
-                    )
-            )
-        );
+        return ['database', 'migrations', "000000_create_" . ConvertCase::snake(Str::plural($file['name'])) . "_table.php"];
     }
 
-    public static function test($name, $extra)
+    public static function model(array $file)
     {
-        $task = explode('.', Arry::get($extra, 'task') ?? '');
-
-        if (self::$variation == 'unit' || $task[0] == 'taskless') {
-            return ["tests" . Text::wrap(ucfirst(self::$variation)) . "{$name}Test.php"];
-        }
-
-        $tasks = Settings::files('test.tasks', fn ($x) => $x);
-
-        return array_map(
-            fn ($x) => Path::glue(
-                ['tests', 'Feature', "{$name}Tests", ucfirst($x) . "{$name}Test.php"]
-            ),
-            array_filter($task) ? array_intersect($task, $tasks) : $tasks
-        );
+        return [self::$family, self::http('model'), 'Models', "{$file['name']}.php"];
     }
 
-    public static function trait($name)
+    public static function notification(array $file)
     {
-        return [Path::glue(array_filter([self::$family, self::http('trait'), Settings::folders('trait'), "{$name}.php"]))];
+        return [self::$family, self::http('notification'), 'Notifications', "{$file['name']}Notification.php"];
     }
 
-    private static function isExtra($extra, $key)
+    public static function observer(array $file)
     {
-        return Arry::get($extra, $key) ?? false;
+        return [self::$family, self::http('observer'), 'Observers', "{$file['name']}Observer.php"];
     }
 
-    private static function parents($types, $extra)
+    public static function policy(array $file)
     {
-        return Arry::get($extra, 'parent') ? Arr::flatten(array_map(
-            fn ($x) => self::$x('', $extra),
-            $types
-        )) : [];
+        return [self::$family, self::http('policy'), 'Policies', "{$file['name']}Policy.php"];
+    }
+
+    public static function provider(array $file)
+    {
+        return [self::$family, self::http('provider'), 'Providers', "{$file['name']}ServiceProvider.php"];
+    }
+
+    public static function request(array $file)
+    {
+        return [self::$family, self::http('request'), 'Requests', "{$file['name']}Requests", ucfirst($file['task']) . "{$file['name']}Request.php"];
+    }
+
+    public static function resource(array $file)
+    {
+        return [self::$family, self::http('resource'), 'Resources', "{$file['name']}Resource.php"];
+    }
+
+    public static function rule(array $file)
+    {
+        return [self::$family, self::http('rule'), 'Rules', "{$file['name']}Rule.php"];
+    }
+
+    public static function seeder(array $file)
+    {
+        return ['database', 'seeders', "{$file['name']}Seeder.php"];
+    }
+
+    public static function service(array $file)
+    {
+        return [self::$family, self::http('service'), 'Services', $file['task'] ? "{$file['name']}Services" : '', ucfirst($file['task']) . "{$file['name']}Service.php"];
+    }
+
+    public static function test(array $file)
+    {
+        $type = self::$mains[0]['type'];
+        $name = ucfirst($file['task']) . "{$file['name']}Test.php";
+
+        return in_array($type, ['test', 'controller'])
+            ? ['tests', ucfirst($file['variation']), $file['task'] ? "{$file['name']}Tests" : '', $name]
+            : ['tests', 'Feature', Settings::folders('class-tests'), Convention::class($type) . 'Tests', $name];
+    }
+
+    public static function trait(array $file)
+    {
+        return [self::$family, self::http('trait'), Settings::folders('trait'), "{$file['name']}.php"];
     }
 
     private static function http($type)
