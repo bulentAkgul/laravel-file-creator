@@ -3,6 +3,8 @@
 namespace Bakgul\FileCreator\Tests\TestServices\AssertionServices\CommandsAssertionServices;
 
 use Bakgul\FileCreator\Tests\TestServices\AssertionServices\CommandsAssertionService;
+use Bakgul\Kernel\Helpers\Convention;
+use Bakgul\Kernel\Tasks\ConvertCase;
 
 class PolicyAssertionService extends CommandsAssertionService
 {
@@ -21,7 +23,7 @@ class PolicyAssertionService extends CommandsAssertionService
             ],
             [
                 'name' => $name,
-                'var' => $name == 'User' ? 'policyUser' : strtolower($name)
+                'var' => $name == 'User' ? 'policyUser' : lcfirst($name)
             ],
             $path
         );

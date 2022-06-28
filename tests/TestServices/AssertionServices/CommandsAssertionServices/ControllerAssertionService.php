@@ -2,7 +2,6 @@
 
 namespace Bakgul\FileCreator\Tests\TestServices\AssertionServices\CommandsAssertionServices;
 
-use Bakgul\Kernel\Tasks\ConvertCase;
 use Bakgul\Kernel\Helpers\Convention;
 use Bakgul\FileCreator\Tests\TestServices\AssertionServices\CommandsAssertionService;
 use Bakgul\Kernel\Helpers\Arry;
@@ -158,9 +157,9 @@ class ControllerAssertionService extends CommandsAssertionService
     {
         return [
             'name' => $n = $this->setName($path, 'Controller.php'),
-            'var' => strtolower($n),
+            'var' => Convention::var($n),
             'parent' => Convention::class($parent),
-            'p_var' => ConvertCase::camel($parent),
+            'p_var' => Convention::var($parent),
             'task' => ucfirst($task)
         ];
     }
