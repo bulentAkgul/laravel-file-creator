@@ -7,7 +7,7 @@ use Bakgul\FileCreator\Tests\TestServices\ExecutionServices\FileTestService;
 class ControllerFileTest extends FileTestService
 {
     public $testType = 'controller';
-    public $file = 'post';
+    public $file = 'post-file';
     public $parent = 'article';
 
     public function __construct()
@@ -36,7 +36,7 @@ class ControllerFileTest extends FileTestService
     /** @test */
     public function controller_nested_api()
     {
-        $this->start('nested-api', $this->testType, $this->file, $this->extra("admin -p={$this->parent}", true, 'index.store', true));
+        $this->start('nested-api', $this->testType, $this->file, $this->extra("admin -p={$this->parent}", true, '', true));
     }
 
     /** @test */

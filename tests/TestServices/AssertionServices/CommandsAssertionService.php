@@ -78,12 +78,12 @@ class CommandsAssertionService
     {
         $content = file($path);
 
-        foreach ($expectations as $i => $expeced) {
-            $expeced = Text::replaceByMap($map, $expeced);
+        foreach ($expectations as $i => $expected) {
+            $expected = Text::replaceByMap($map, $expected);
 
             $found = trim($content[$i]);
 
-            if ($found != $expeced) return [false, $this->message($path, $expeced, $found, $i + 1)];
+            if ($found != $expected) return [false, $this->message($path, $expected, $found, $i + 1)];
         }
 
         return [true, ''];

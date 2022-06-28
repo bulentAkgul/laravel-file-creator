@@ -3,6 +3,7 @@
 namespace Bakgul\FileCreator\Tests\Feature\FileTypeTests;
 
 use Bakgul\FileCreator\Tests\TestServices\ExecutionServices\FileTestService;
+use Bakgul\Kernel\Helpers\Settings;
 
 class ActionFileTest extends FileTestService
 {
@@ -19,7 +20,7 @@ class ActionFileTest extends FileTestService
     {
         $this->start('', $this->testType, $this->file);
     }
-
+    
     /** @test */
     public function action_static()
     {
