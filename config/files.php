@@ -294,7 +294,7 @@ return [
         'pairs' => [],
     ],
     'rule' => [
-        'name_schema' => '{{ name }}',
+        'name_schema' => '{{ name }}{{ suffix }}',
         'name_count' => 'X',
         'family' => 'src',
         'path_schema' => '{{ container }}{{ subs }}',
