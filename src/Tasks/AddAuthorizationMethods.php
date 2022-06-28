@@ -26,16 +26,17 @@ class AddAuthorizationMethods
 
     public static function _(array $request): void
     {
-        if (self::hasNoPolicy($request['attr'])) return;
+        if (self::hasNoPolicyMethod($request['attr'])) return;
 
         self::setVariables($request);
 
         self::addMethods();
     }
 
-    private static function hasNoPolicy(array $attr): bool
+    private static function hasNoPolicyMethod(array $attr): bool
     {
-        return empty(array_filter($attr['queue'], fn ($x) => $x['type'] == 'policy' && $x['name'] == $attr['name']));
+        return $attr['variation'] == 'invokable'
+            || empty(array_filter($attr['queue'], fn ($x) => $x['type'] == 'policy' && $x['name'] == $attr['name']));
     }
 
     private static function setVariables($request)
