@@ -25,8 +25,8 @@ class FileTestService extends TestCase
     public function __construct(?string $scenario = null, ?bool $hasRoot = null)
     {
         $this->scenario = TestDataService::standalone(
-            $scenario ?: Arry::random(['sl', 'sp', 'pl'])[0],
-            $hasRoot ?? Arry::random([true, false])[0]
+            $scenario ?: Arry::random(['sl', 'sp', 'pl']),
+            $hasRoot ?? Arry::random([true, false])
         );
 
         parent::__construct();
