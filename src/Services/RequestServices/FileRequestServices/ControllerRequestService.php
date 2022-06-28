@@ -6,6 +6,7 @@ use Bakgul\Kernel\Helpers\Text;
 use Bakgul\Kernel\Helpers\Convention;
 use Bakgul\FileCreator\Services\RequestServices\SrcRequestService;
 use Bakgul\FileCreator\Tasks\ModifyFilePointer;
+use Bakgul\Kernel\Helpers\Arry;
 use Bakgul\Kernel\Helpers\Path;
 use Bakgul\Kernel\Helpers\Settings;
 
@@ -33,7 +34,7 @@ class ControllerRequestService extends SrcRequestService
     private function setUseLines(): string
     {
         if ($this->request['attr']['variation'] == 'invokable') return '';
-        
+
         $uses = [$this->setInertia()];
 
         foreach (['request', 'service'] as $type) {
@@ -45,7 +46,7 @@ class ControllerRequestService extends SrcRequestService
             ));
         }
 
-        return implode(PHP_EOL, array_filter($uses)) . PHP_EOL;
+        return implode(PHP_EOL, Arry::sort(array_filter($uses))) . PHP_EOL;
     }
 
     private function setInertia()
@@ -84,7 +85,8 @@ class ControllerRequestService extends SrcRequestService
     private function generateNamespace($type)
     {
         return 'use ' . str_replace(['\\\\', '/'], '\\', Text::replaceByMap(
-            $this->modifyMap($type), $this->schema($type['type'])
+            $this->modifyMap($type),
+            $this->schema($type['type'])
         )) . ';';
     }
 

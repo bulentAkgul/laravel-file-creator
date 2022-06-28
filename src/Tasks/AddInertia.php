@@ -4,6 +4,7 @@ namespace Bakgul\FileCreator\Tasks;
 
 use Bakgul\FileContent\Helpers\Content;
 use Bakgul\FileContent\Tasks\WriteToFile;
+use Bakgul\FileCreator\Functions\GetMethodName;
 use Bakgul\Kernel\Functions\ExtractNames;
 use Bakgul\Kernel\Helpers\Path;
 use Bakgul\Kernel\Helpers\Settings;
@@ -42,14 +43,16 @@ class AddInertia
 
     private static function setMethod($line)
     {
-        self::$method = str_contains($line, 'function')
-            ? trim(Str::between($line, 'function', '('))
-            : '';
+        self::$method = str_contains($line, 'function') ? GetMethodName::_($line) : '';
     }
 
     private static function modifyLine($line, $request)
     {
-        return trim(str_replace(['return ', ';'], [self::line($request), ''], $line), "\r\n;") . ');' . PHP_EOL;
+        return trim(str_replace(
+            ['return ', ';'],
+            [self::line($request), ''],
+            $line
+        ), "\r\n;") . ');' . PHP_EOL;
     }
 
     private static function line(array $request)

@@ -4,6 +4,7 @@ namespace Bakgul\FileCreator\Tasks;
 
 use Bakgul\FileContent\Helpers\Content;
 use Bakgul\FileContent\Tasks\WriteToFile;
+use Bakgul\FileCreator\Functions\GetMethodName;
 use Bakgul\FileCreator\Functions\SetViewPath;
 use Bakgul\Kernel\Helpers\Arry;
 use Bakgul\Kernel\Helpers\Isolation;
@@ -87,9 +88,7 @@ class AddViewReturn
 
     private static function setMethod($line)
     {
-        self::$method = str_contains($line, 'function')
-            ? trim(Str::between($line, 'function', '('))
-            : '';
+        self::$method = str_contains($line, 'function') ? GetMethodName::_($line) : '';
     }
 
     private static function modifyLine($line, $request)
