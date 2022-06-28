@@ -19,4 +19,16 @@ class ClassFileTest extends FileTestService
     {
         $this->start('', $this->testType, $this->file, ['subs' => ['user-forms', 'nice-user-forms']]);
     }
+    
+    /** @test */
+    public function class_static()
+    {
+        $this->start('static', $this->testType, $this->file, ['subs' => ['user-forms', 'nice-user-forms']]);
+    }
+    
+    /** @test */
+    public function class_invokable()
+    {
+        $this->start('invokable', $this->testType, $this->file, ['subs' => ['user-forms', 'nice-user-forms']]);
+    }
 }

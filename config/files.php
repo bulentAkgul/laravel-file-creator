@@ -117,7 +117,7 @@ return [
         'family' => 'src',
         'path_schema' => '{{ subs }}',
         'tasks' => [''],
-        'variations' => [''],
+        'variations' => ['', 'static', 'invokable'],
         'pairs' => [],
     ],
     'command' => [

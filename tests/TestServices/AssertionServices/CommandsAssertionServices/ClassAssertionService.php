@@ -20,4 +20,34 @@ class ClassAssertionService extends CommandsAssertionService
             $path
         );
     }
+
+    public function static(string $path, string $rootNamespace, array $extra): array
+    {
+        return $this->assert(
+            [
+                2 => $this->setNamespace($rootNamespace, 'src', $this->convertTail($extra['subs'])),
+                4 => 'class {{ name }}',
+                6 => 'public static function _()'
+            ],
+            [
+                'name' => $this->setName($path, '.php')
+            ],
+            $path
+        );
+    }
+
+    public function invokable(string $path, string $rootNamespace, array $extra): array
+    {
+        return $this->assert(
+            [
+                2 => $this->setNamespace($rootNamespace, 'src', $this->convertTail($extra['subs'])),
+                4 => 'class {{ name }}',
+                6 => 'public function __invoke()'
+            ],
+            [
+                'name' => $this->setName($path, '.php')
+            ],
+            $path
+        );
+    }
 }
